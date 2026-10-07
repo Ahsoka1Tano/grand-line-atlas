@@ -1,0 +1,1566 @@
+.world-experience {
+  padding: 27px 32px 17px;
+  max-width: 1900px;
+  margin: auto;
+}
+.world-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 23px;
+}
+.world-heading > .eyebrow {
+  font-size: 7px;
+}
+.world-heading h1 {
+  font-family: var(--font-display);
+  font-size: 30px;
+  letter-spacing: -0.8px;
+  font-weight: 400;
+  margin: 12px 0 0;
+  display: flex;
+  align-items: baseline;
+  gap: 21px;
+}
+.world-heading h1 > span {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 20px;
+  color: #6f8490;
+  letter-spacing: 0;
+}
+.journal-button {
+  min-height: 39px;
+  font-size: 10px;
+  gap: 9px;
+}
+.journal-button > span {
+  font-size: 8px;
+  color: #c8b28b;
+  border-left: 1px solid #ffffff1a;
+  padding-left: 12px;
+  margin-left: 5px;
+}
+.world-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 302px;
+  gap: 20px;
+  align-items: stretch;
+}
+.atlas-frame {
+  position: relative;
+  min-height: 500px;
+  height: calc(100dvh - 263px);
+  max-height: 830px;
+  isolation: isolate;
+  border: 1px solid #314957;
+  border-radius: 8px;
+  overflow: hidden;
+  background: radial-gradient(ellipse, #1b3853, #0c2030 65%, #0b1822);
+}
+.atlas-frame:after {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: 7px;
+  box-shadow: inset 0 0 50px #03101d75;
+}
+.map-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+  outline: none;
+}
+.map-viewport:focus-visible {
+  box-shadow: inset 0 0 0 2px #d6b780;
+  z-index: 1;
+}
+.map-viewport.is-dragging {
+  cursor: grabbing;
+}
+.world-plane {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform-origin: center;
+  will-change: transform;
+  user-select: none;
+}
+.world-map-art {
+  object-fit: fill;
+  pointer-events: none;
+  filter: saturate(0.8) brightness(0.78);
+  mask-image: linear-gradient(transparent 0%, #000 6%, #000 93%, transparent 100%);
+}
+.world-ocean-shade {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse, transparent 25%, #09243a44 73%, #071827b3);
+  pointer-events: none;
+}
+.world-routes {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+.sea-route {
+  stroke: #d5d4bf60;
+  stroke-width: 1.6;
+  stroke-dasharray: 5 10;
+  fill: none;
+  stroke-linecap: round;
+}
+.planned-route {
+  stroke: #f3ce87;
+  stroke-width: 3;
+  stroke-dasharray: 6 9;
+  fill: none;
+  stroke-linecap: round;
+}
+.planned-route.is-sailing {
+  animation: routeFlow 3s linear infinite;
+}
+.planned-route-glow {
+  stroke: #f4c97999;
+  stroke-width: 9;
+  fill: none;
+}
+.port-dot {
+  fill: #d4ccaf88;
+  stroke: #e4dec452;
+  stroke-width: 2;
+}
+.sea-label {
+  position: absolute;
+  pointer-events: none;
+  color: #cad8df;
+  opacity: 0.48;
+  text-shadow: 0 2px 10px #0c1d2a;
+  white-space: nowrap;
+}
+.sea-label-main {
+  left: 48%;
+  top: 17%;
+  transform: translateX(-50%);
+  font-family: Georgia, serif;
+  font-size: 35px;
+  letter-spacing: 17px;
+}
+.sea-label-sub {
+  left: 48%;
+  top: 22%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  letter-spacing: 5px;
+  opacity: 0.33;
+}
+.map-node {
+  position: absolute;
+  width: 37px;
+  height: 37px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  transform: translate(-50%, -50%) scale(calc(1 / var(--map-scale)));
+  transform-origin: center;
+  z-index: 5;
+  overflow: visible;
+  color: #e4e7df;
+  cursor: pointer;
+}
+.map-node-ring {
+  height: 34px;
+  width: 34px;
+  border-radius: 50%;
+  border: 1px solid #d5d6cc9a;
+  background: #102337cc;
+  backdrop-filter: blur(5px);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 3px 15px #00132588;
+  position: relative;
+  transition:
+    background 0.2s,
+    border 0.2s,
+    box-shadow 0.2s;
+}
+.map-node.is-visited .map-node-ring {
+  border-color: #b9c9a9;
+  color: #d0dfb5;
+}
+.map-node.is-selected .map-node-ring {
+  border-color: #e6c17f;
+  color: #f1d29a;
+  background: #312c23e0;
+  box-shadow:
+    0 0 0 5px #e6c17f22,
+    0 3px 15px #00132588;
+}
+.map-node:hover .map-node-ring {
+  border-color: #f3d09b;
+  color: #f3d09b;
+  background: #273c45;
+  box-shadow:
+    0 0 0 5px #e6c17f1a,
+    0 3px 15px #00132588;
+}
+.map-node.is-current .map-node-ring:before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border: 1px solid #e7c48866;
+  border-radius: 50%;
+  animation: currentPortPulse 3.8s ease-in-out infinite;
+}
+.node-check {
+  position: absolute;
+  right: -3px;
+  top: -3px;
+  height: 12px;
+  width: 12px;
+  border: 1px solid #829f86;
+  border-radius: 50%;
+  background: #3d634e;
+  color: #e1f1d8;
+  display: grid;
+  place-items: center;
+}
+.map-node-label {
+  position: absolute;
+  top: 44px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  letter-spacing: 0.1px;
+  text-shadow:
+    0 1px 7px #000,
+    0 1px 12px #071525;
+  background: #081b2cb3;
+  padding: 6px 9px;
+  border-radius: 4px;
+  border: 1px solid #aec4ca17;
+  pointer-events: none;
+  text-align: center;
+}
+.map-node-label > span {
+  display: block;
+  font-size: 5px;
+  letter-spacing: 1.4px;
+  color: #bac6c8;
+  font-weight: 500;
+  margin-top: 4px;
+}
+.map-node.is-selected .map-node-label {
+  color: #f3d49f;
+  background: #172a35e6;
+  border-color: #d4b57f55;
+}
+.map-ship {
+  position: absolute;
+  z-index: 4;
+  transform: translate(-50%, -50%) scale(calc(1 / var(--map-scale)));
+  transform-origin: center;
+  width: 37px;
+  height: 37px;
+  border: 1px solid #e7c48888;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #092239bd;
+  color: #fff0d3;
+  box-shadow: 0 0 20px #e6ca8222;
+  pointer-events: none;
+}
+.map-ship.is-sailing {
+  box-shadow: 0 0 25px #e6ca8244;
+}
+.ship-caption {
+  position: absolute;
+  top: 43px;
+  white-space: nowrap;
+  font-size: 5px;
+  letter-spacing: 1px;
+  color: #e4d2ac;
+  text-shadow: 0 2px 4px #000;
+}
+.ship-wake {
+  position: absolute;
+  inset: -6px;
+  z-index: -1;
+  border: 1px solid #d4f0fc22;
+  border-radius: 50%;
+  opacity: 0.8;
+}
+.is-sailing .ship-wake {
+  animation: currentPortPulse 1.6s ease-in-out infinite;
+}
+.world-cloud {
+  position: absolute;
+  width: 470px;
+  height: 150px;
+  pointer-events: none;
+  filter: blur(25px);
+  background: radial-gradient(ellipse, #e6f3fd24, transparent 65%);
+  z-index: 3;
+}
+.world-cloud-one {
+  left: 44%;
+  top: 5%;
+  animation: cloudDrift 40s ease-in-out infinite alternate;
+}
+.world-cloud-two {
+  left: 0;
+  bottom: 10%;
+  width: 350px;
+  opacity: 0.6;
+  animation: cloudDrift 48s ease-in-out infinite alternate-reverse;
+}
+.atlas-topline,
+.atlas-bottomline {
+  position: absolute;
+  z-index: 8;
+  left: 19px;
+  right: 19px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  pointer-events: none;
+  color: #b2c1ca;
+  font-size: 7px;
+  letter-spacing: 1.4px;
+}
+.atlas-topline {
+  top: 19px;
+}
+.atlas-topline > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.atlas-topline > span > span {
+  opacity: 0.4;
+  margin: 0 4px;
+}
+.atlas-current {
+  color: #d8c7a4 !important;
+  font-size: 7px;
+  letter-spacing: 0.2px;
+}
+.atlas-bottomline {
+  bottom: 16px;
+  font-size: 7px;
+  letter-spacing: 0.2px;
+}
+.atlas-bottomline > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.atlas-bottomline > span:last-child {
+  color: #748fa4;
+  font-size: 7px;
+}
+.atlas-bottomline > span:last-child > span {
+  margin: 0 1px;
+  opacity: 0.6;
+}
+.chart-dot {
+  width: 4px;
+  height: 4px;
+  background: #d9c794;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #d9c79466;
+}
+.atlas-compass {
+  position: absolute;
+  z-index: 7;
+  bottom: 55px;
+  right: 24px;
+  pointer-events: none;
+  color: #c1c3ac8a;
+  text-align: center;
+}
+.atlas-compass > span {
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 8px;
+  margin-bottom: -4px;
+}
+.map-zoom-controls {
+  position: absolute;
+  left: 19px;
+  bottom: 53px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  z-index: 8;
+  border: 1px solid #a5b3b12e;
+  border-radius: 5px;
+  background: #0e2131dc;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 3px 14px #03121d44;
+  color: #a9bbc5;
+}
+.map-zoom-controls > button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 36px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+.map-zoom-controls > button:hover:not(:disabled) {
+  color: #f3d49f;
+  background: #28434c;
+}
+.map-zoom-controls > button:disabled {
+  opacity: 0.35;
+}
+.map-zoom-controls > span {
+  font-size: 8px;
+  width: 33px;
+  text-align: center;
+  font-family: monospace;
+}
+.map-zoom-controls > .zoom-divider {
+  width: 1px;
+  height: 16px;
+  background: #adc3cf25;
+  margin: 0 3px;
+}
+.voyage-hud {
+  position: absolute;
+  z-index: 9;
+  top: 54px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  background: #0b1c2eed;
+  border: 1px solid #c1aa744d;
+  border-radius: 6px;
+  padding: 13px 16px;
+  min-width: 255px;
+  box-shadow: 0 7px 22px #0004;
+  backdrop-filter: blur(12px);
+}
+.voyage-hud-icon {
+  color: #edc98a;
+  display: grid;
+  place-items: center;
+  width: 28px;
+}
+.voyage-hud > div {
+  flex: 1;
+}
+.voyage-hud > div > span {
+  display: block;
+  font-size: 6px;
+  letter-spacing: 1.5px;
+  color: #8d9b9d;
+  margin-bottom: 5px;
+}
+.voyage-hud strong {
+  font-size: 11px;
+  font-weight: 600;
+}
+.voyage-progress {
+  height: 2px;
+  width: 100%;
+  margin-top: 9px;
+  background: #d1b57d22;
+  overflow: hidden;
+}
+.voyage-progress > i {
+  display: block;
+  height: 100%;
+  background: #dfbd80;
+}
+.voyage-hud > button {
+  padding: 5px;
+  margin-left: 8px;
+  display: grid;
+  place-items: center;
+  color: #829caa;
+}
+.voyage-hud > button:hover {
+  color: var(--ivory);
+}
+.island-panel {
+  border: 1px solid #2c3d49;
+  border-radius: 8px;
+  background: #101c26;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.island-panel-image {
+  height: 173px;
+  position: relative;
+  flex-shrink: 0;
+  background: #1a3240;
+}
+.island-panel-image img {
+  object-fit: cover;
+  animation: islandImageIn 0.4s ease-out;
+}
+.island-panel-image-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #06152544 0%, transparent 35%, #101c26 100%);
+}
+.island-number {
+  position: absolute;
+  top: 19px;
+  left: 20px;
+  font-family: Georgia, serif;
+  font-size: 30px;
+  color: #ffffffde;
+  text-shadow: 0 3px 10px #0007;
+}
+.island-number > span {
+  font-family: var(--font-ui);
+  font-size: 6px;
+  letter-spacing: 1.8px;
+  display: block;
+  margin-top: 2px;
+  color: #f0eddb;
+}
+.island-status {
+  position: absolute;
+  bottom: 14px;
+  right: 17px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 7px;
+  padding: 5px 7px;
+  border: 1px solid #d5dbe331;
+  border-radius: 3px;
+  color: #d6e0e7;
+  background: #0b1d2bb3;
+}
+.island-status.here {
+  color: #d4ddbb;
+  border-color: #97ad743b;
+}
+.island-panel-copy {
+  padding: 13px 22px 21px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+.island-panel-copy > .eyebrow {
+  font-size: 6px;
+  letter-spacing: 1.3px;
+  gap: 7px;
+}
+.island-panel h2 {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 400;
+  letter-spacing: -0.7px;
+  line-height: 1.4;
+  margin: 11px 0 5px;
+}
+.island-subtitle {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 12px;
+  color: #b4a38a;
+}
+.island-description {
+  font-size: 10px;
+  line-height: 1.9;
+  color: #92a5b1;
+  margin: 19px 0 17px;
+}
+.island-points {
+  border-top: 1px solid #ffffff0c;
+  padding: 16px 0 14px;
+}
+.island-points > .eyebrow {
+  font-size: 6px;
+  letter-spacing: 1.6px;
+  color: #657c8d;
+  margin-bottom: 14px;
+}
+.island-points > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  color: #a9b9c4;
+  margin-bottom: 10px;
+}
+.island-points > div svg {
+  color: #5c7c8d;
+}
+.route-preview {
+  border-top: 1px solid #ffffff0c;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 13px 0 0;
+  margin: 0 0 14px;
+  color: #b8a67f;
+  font-size: 8px;
+}
+.route-preview > svg {
+  flex-shrink: 0;
+}
+.route-preview > span {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+.route-preview small {
+  display: block;
+  flex-basis: 100%;
+  font-size: 7px;
+  color: #648192;
+  margin-top: 3px;
+}
+.island-action {
+  width: 100%;
+  min-height: 43px;
+  font-size: 10px;
+  margin-top: auto;
+  padding: 0 12px;
+}
+.island-action:disabled {
+  background: #273a47;
+  color: #718b9d;
+  border-color: #3e5563;
+  box-shadow: none;
+  transform: none;
+  cursor: default;
+}
+.island-action-note {
+  text-align: center;
+  font-size: 7px;
+  color: #688194;
+  line-height: 1.7;
+  margin-top: 10px;
+}
+.world-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 17px;
+}
+.world-location-list {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.world-location-list > button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  font-size: 8px;
+  color: #8498a7;
+  border: 1px solid #ffffff0b;
+  background: #101a23;
+  border-radius: 4px;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.world-location-list > button > span {
+  font-family: monospace;
+  color: #4d6b7f;
+  font-size: 8px;
+}
+.world-location-list > button > svg {
+  color: #a6bb94;
+}
+.world-location-list > button.selected {
+  border-color: #cfb27844;
+  background: #1e2a32;
+  color: #e3cc9f;
+}
+.world-location-list > button.selected > span {
+  color: #aa9166;
+}
+.world-location-list > button:hover {
+  color: var(--ivory);
+  background: #1d2b36;
+}
+.world-atlas-note {
+  font-size: 7px;
+  letter-spacing: 0.3px;
+  color: #4b697e;
+  white-space: nowrap;
+}
+.world-atlas-note > span {
+  margin: 0 6px;
+  color: #887651;
+}
+.world-status {
+  font-size: 8px;
+  color: #779689;
+  min-height: 13px;
+  margin: 13px 0 0;
+  letter-spacing: 0.1px;
+}
+.location-modal .modal-inner {
+  width: min(990px, 100%);
+  background: #101b25;
+}
+.location-panorama {
+  height: 350px;
+  position: relative;
+}
+.location-panorama img {
+  object-fit: cover;
+  object-position: center 55%;
+}
+.location-panorama-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #07122122 30%, #101b25e8 100%);
+}
+.location-panorama-title {
+  position: absolute;
+  left: 37px;
+  bottom: 28px;
+  right: 30px;
+  text-shadow: 0 2px 13px #0008;
+}
+.location-panorama-title > .eyebrow {
+  color: #e4c79c;
+  font-size: 7px;
+}
+.location-panorama-title h2 {
+  font-family: var(--font-display);
+  font-size: 41px;
+  font-weight: 400;
+  letter-spacing: -1px;
+  margin: 14px 0 10px;
+}
+.location-panorama-title > span:last-child {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  color: #e6d5b8;
+}
+.location-scene-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  padding: 29px 37px 34px;
+}
+.location-story > .eyebrow {
+  font-size: 7px;
+  gap: 7px;
+}
+.location-story > p {
+  font-size: 12px;
+  line-height: 1.95;
+  color: #a6b6c1;
+  margin: 15px 0 24px;
+}
+.location-scene-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #819781;
+  font-size: 8px;
+  line-height: 1.9;
+  border-top: 1px solid #ffffff0c;
+  padding-top: 17px;
+}
+.location-scene-note > svg {
+  color: #bba276;
+}
+.location-pois > .eyebrow {
+  font-size: 7px;
+  margin-bottom: 13px;
+}
+.poi-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.poi-tabs > button {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 11px 12px;
+  font-size: 10px;
+  color: #8ea4b3;
+  border: 1px solid #ffffff0b;
+  border-radius: 4px;
+  text-align: left;
+  background: #13222f;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.poi-tabs > button > svg:last-child {
+  margin-left: auto;
+  opacity: 0.5;
+}
+.poi-tabs > button.selected {
+  background: #25313a;
+  border-color: #bfaa7955;
+  color: #dfc390;
+}
+.poi-tabs > button:hover {
+  color: var(--ivory);
+  background: #23313d;
+}
+.poi-description {
+  font-size: 10px;
+  line-height: 1.85;
+  color: #809cad;
+  margin: 14px 0 0;
+  min-height: 56px;
+}
+.journal-modal .modal-inner {
+  width: min(570px, 100%);
+}
+.journal-content {
+  padding: 36px 37px 29px;
+}
+.journal-content > .eyebrow {
+  font-size: 7px;
+  gap: 9px;
+}
+.journal-content h2 {
+  font-family: var(--font-display);
+  font-size: 31px;
+  font-weight: 400;
+  letter-spacing: -1px;
+  margin: 21px 0 14px;
+}
+.journal-content > p {
+  font-size: 10px;
+  line-height: 1.9;
+  color: #8ba1b0;
+}
+.journal-progress {
+  margin: 25px 0 21px;
+}
+.journal-progress > span {
+  font-size: 24px;
+  font-family: Georgia, serif;
+  color: #e1c48d;
+}
+.journal-progress small {
+  font-family: var(--font-ui);
+  font-size: 9px;
+  color: #708c9e;
+  margin-left: 5px;
+}
+.journal-progress > div {
+  height: 3px;
+  background: #d4bb8622;
+  margin-top: 10px;
+}
+.journal-progress i {
+  height: 100%;
+  display: block;
+  background: #d1b681;
+}
+.journal-locations {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.journal-locations > button {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  text-align: left;
+  min-height: 62px;
+  padding: 7px;
+  border: 1px solid #ffffff0b;
+  background: #10202d;
+  border-radius: 4px;
+}
+.journal-locations > button:hover {
+  border-color: #be9d6655;
+  background: #182936;
+}
+.journal-locations img {
+  object-fit: cover;
+  border-radius: 3px;
+}
+.journal-locations > button > span:nth-child(2) {
+  flex: 1;
+}
+.journal-locations strong {
+  display: block;
+  font-size: 11px;
+  font-weight: 500;
+  color: #c1cdd5;
+  margin-bottom: 5px;
+}
+.journal-locations small {
+  display: block;
+  font-size: 6px;
+  letter-spacing: 1.5px;
+  color: #688499;
+}
+.journal-locations > button > svg {
+  color: #b1c497;
+  margin-right: 9px;
+}
+.journal-unvisited {
+  font-size: 7px;
+  color: #496a7f;
+  margin-right: 8px;
+}
+.journal-reset {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #8d9dac;
+  font-size: 9px;
+  margin-top: 26px;
+  padding: 0;
+  min-height: 30px;
+}
+.journal-reset:hover {
+  color: #ddc394;
+}
+.journal-note {
+  display: block;
+  color: #4d6a7f;
+  font-size: 7px;
+  margin-top: 7px;
+}
+@keyframes routeFlow {
+  to {
+    stroke-dashoffset: -90;
+  }
+}
+@keyframes currentPortPulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.15;
+    transform: scale(1.2);
+  }
+}
+@keyframes cloudDrift {
+  to {
+    transform: translateX(170px) translateY(50px);
+  }
+}
+@keyframes islandImageIn {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (min-width: 1700px) {
+  .world-experience {
+    padding-left: 48px;
+    padding-right: 48px;
+  }
+  .world-layout {
+    grid-template-columns: minmax(0, 1fr) 330px;
+  }
+  .island-panel-image {
+    height: 205px;
+  }
+  .island-panel-copy {
+    padding: 16px 26px 25px;
+  }
+  .island-panel h2 {
+    font-size: 30px;
+  }
+  .island-description {
+    font-size: 12px;
+  }
+  .island-points > div {
+    font-size: 10px;
+  }
+  .island-points {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+  .island-action {
+    min-height: 47px;
+    font-size: 11px;
+  }
+  .atlas-frame {
+    height: calc(100dvh - 271px);
+  }
+}
+@media (max-width: 1100px) {
+  .world-experience {
+    padding: 25px 24px 18px;
+  }
+  .world-layout {
+    grid-template-columns: minmax(0, 1fr) 268px;
+    gap: 14px;
+  }
+  .world-heading h1 {
+    font-size: 27px;
+    gap: 14px;
+  }
+  .world-heading h1 > span {
+    font-size: 18px;
+  }
+  .island-panel-copy {
+    padding: 13px 18px 19px;
+  }
+  .island-panel h2 {
+    font-size: 23px;
+  }
+  .island-panel-image {
+    height: 150px;
+  }
+  .island-description {
+    font-size: 10px;
+    margin-top: 17px;
+  }
+  .island-points > div {
+    font-size: 8px;
+  }
+  .world-atlas-note {
+    display: none;
+  }
+  .world-location-list > button {
+    font-size: 7px;
+    padding: 8px 10px;
+  }
+  .atlas-frame {
+    height: calc(100dvh - 256px);
+    min-height: 510px;
+  }
+  .atlas-bottomline > span:last-child {
+    display: none;
+  }
+  .atlas-topline {
+    left: 14px;
+    right: 14px;
+  }
+  .atlas-topline > span:first-child {
+    font-size: 6px;
+    letter-spacing: 1px;
+  }
+  .atlas-compass {
+    right: 14px;
+    bottom: 52px;
+  }
+  .map-node-label {
+    font-size: 10px;
+    padding: 5px 7px;
+  }
+  .map-node-label > span {
+    font-size: 4px;
+    letter-spacing: 0.9px;
+  }
+  .map-node-ring {
+    width: 31px;
+    height: 31px;
+  }
+  .map-node-label {
+    top: 40px;
+  }
+  .map-zoom-controls {
+    left: 14px;
+  }
+  .atlas-bottomline {
+    left: 14px;
+  }
+  .world-location-list {
+    gap: 6px;
+  }
+}
+@media (max-width: 850px) {
+  .world-experience {
+    padding: 22px 20px 15px;
+  }
+  .world-layout {
+    grid-template-columns: 1fr;
+  }
+  .atlas-frame {
+    height: 520px;
+    min-height: 0;
+  }
+  .island-panel {
+    display: grid;
+    grid-template-columns: 210px 1fr;
+  }
+  .island-panel-image {
+    height: 100%;
+    min-height: 250px;
+  }
+  .island-panel-image-shade {
+    background: linear-gradient(90deg, transparent, #101c2644);
+  }
+  .island-panel-copy {
+    padding: 22px;
+  }
+  .island-panel h2 {
+    font-size: 26px;
+  }
+  .island-description {
+    font-size: 11px;
+    max-width: 440px;
+  }
+  .island-points {
+    display: none;
+  }
+  .island-action {
+    margin-top: 15px;
+    min-height: 42px;
+    max-width: 280px;
+  }
+  .island-action-note {
+    text-align: left;
+    margin-left: 1px;
+  }
+  .island-status {
+    bottom: 19px;
+    right: 17px;
+  }
+  .route-preview {
+    margin-bottom: 0;
+  }
+  .world-heading h1 {
+    font-size: 26px;
+  }
+  .world-heading h1 > span {
+    font-size: 17px;
+  }
+  .journal-button {
+    font-size: 9px;
+    min-height: 37px;
+    padding: 0 13px;
+  }
+  .journal-button > span {
+    font-size: 7px;
+  }
+  .world-location-list > button {
+    font-size: 8px;
+  }
+  .world-status {
+    font-size: 8px;
+  }
+  .location-panorama {
+    height: 310px;
+  }
+  .location-scene-content {
+    gap: 30px;
+    padding: 25px 30px 30px;
+  }
+  .location-panorama-title {
+    left: 30px;
+  }
+  .location-panorama-title h2 {
+    font-size: 36px;
+  }
+}
+@media (max-width: 650px) {
+  .world-experience {
+    padding: 23px 16px 17px;
+  }
+  .world-heading {
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 20px;
+  }
+  .world-heading > .eyebrow,
+  .world-heading .eyebrow {
+    font-size: 6px;
+    letter-spacing: 1.5px;
+  }
+  .world-heading h1 {
+    font-size: 24px;
+    margin-top: 13px;
+    display: block;
+  }
+  .world-heading h1 > span {
+    display: block;
+    font-size: 15px;
+    margin-top: 8px;
+    color: #718999;
+  }
+  .journal-button {
+    min-height: 36px;
+    min-width: 36px;
+    font-size: 0;
+    padding: 0 10px;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .journal-button > span {
+    border-left: 0;
+    padding-left: 0;
+    font-size: 7px;
+    margin-left: 0;
+  }
+  .journal-button svg {
+    width: 14px;
+  }
+  .world-layout {
+    gap: 16px;
+  }
+  .atlas-frame {
+    height: 376px;
+    border-radius: 6px;
+  }
+  .atlas-topline {
+    top: 14px;
+    left: 12px;
+    right: 12px;
+  }
+  .atlas-topline > span:first-child {
+    font-size: 5px;
+    letter-spacing: 0.7px;
+    gap: 5px;
+  }
+  .atlas-topline > span:first-child > span {
+    margin: 0;
+  }
+  .atlas-topline > span > svg {
+    width: 10px;
+  }
+  .atlas-current {
+    font-size: 6px !important;
+    max-width: 110px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  .world-map-art {
+    mask-image: linear-gradient(transparent 0%, #000 8%, #000 89%, transparent 100%);
+  }
+  .map-node-ring {
+    width: 28px;
+    height: 28px;
+  }
+  .map-node-ring > svg {
+    width: 13px;
+    height: 13px;
+  }
+  .map-node.is-current .map-node-ring:before {
+    inset: -5px;
+  }
+  .map-node {
+    width: 44px;
+    height: 44px;
+  }
+  .map-node-label {
+    font-size: 8px;
+    top: 41px;
+    padding: 4px 6px;
+    font-weight: 600;
+  }
+  .map-node-label > span {
+    font-size: 3px;
+    letter-spacing: 0.6px;
+    margin-top: 3px;
+  }
+  .node-check {
+    height: 10px;
+    width: 10px;
+    right: -3px;
+    top: -3px;
+  }
+  .node-check > svg {
+    width: 7px;
+    height: 7px;
+  }
+  .map-ship {
+    width: 27px;
+    height: 27px;
+  }
+  .map-ship > svg {
+    width: 17px;
+    height: 17px;
+  }
+  .ship-caption {
+    top: 33px;
+    font-size: 4px;
+    letter-spacing: 0.5px;
+  }
+  .ship-wake {
+    inset: -4px;
+  }
+  .sea-label-main {
+    font-size: 27px;
+    letter-spacing: 10px;
+    top: 11%;
+  }
+  .sea-label-sub {
+    font-size: 8px;
+    letter-spacing: 3px;
+    top: 17%;
+  }
+  .atlas-bottomline {
+    bottom: 12px;
+    font-size: 6px;
+    left: 13px;
+    right: 13px;
+    gap: 6px;
+  }
+  .map-zoom-controls {
+    left: 12px;
+    bottom: 38px;
+  }
+  .map-zoom-controls > button {
+    width: 34px;
+    height: 37px;
+  }
+  .map-zoom-controls > span {
+    font-size: 7px;
+    width: 28px;
+  }
+  .atlas-compass {
+    bottom: 42px;
+    right: 14px;
+  }
+  .atlas-compass > svg {
+    height: 35px;
+    width: 35px;
+  }
+  .atlas-compass > span {
+    font-size: 6px;
+    margin-bottom: -3px;
+  }
+  .voyage-hud {
+    top: 45px;
+    padding: 10px 12px;
+    min-width: 224px;
+    gap: 8px;
+  }
+  .voyage-hud strong {
+    font-size: 10px;
+  }
+  .voyage-hud > div > span {
+    font-size: 5px;
+  }
+  .voyage-hud-icon > svg {
+    width: 16px;
+  }
+  .island-panel {
+    display: flex;
+    border-radius: 6px;
+  }
+  .island-panel-image {
+    height: 165px;
+    min-height: 0;
+  }
+  .island-panel-image-shade {
+    background: linear-gradient(180deg, #06152511 20%, #101c26 100%);
+  }
+  .island-panel-image img {
+    object-position: center 55%;
+  }
+  .island-number {
+    font-size: 29px;
+    left: 19px;
+    top: 18px;
+  }
+  .island-number > span {
+    font-size: 5px;
+  }
+  .island-status {
+    bottom: 15px;
+    right: 17px;
+    font-size: 7px;
+  }
+  .island-panel-copy {
+    padding: 8px 20px 22px;
+  }
+  .island-panel h2 {
+    font-size: 27px;
+    margin-top: 13px;
+  }
+  .island-subtitle {
+    font-size: 13px;
+  }
+  .island-description {
+    font-size: 12px;
+    line-height: 1.85;
+    margin: 16px 0 13px;
+  }
+  .island-points {
+    display: block;
+    padding-top: 15px;
+    padding-bottom: 9px;
+  }
+  .island-points > div {
+    font-size: 10px;
+    margin-bottom: 12px;
+  }
+  .island-points > .eyebrow {
+    font-size: 6px;
+  }
+  .island-action {
+    margin-top: 8px;
+    max-width: none;
+    font-size: 11px;
+    min-height: 45px;
+  }
+  .island-action-note {
+    text-align: center;
+    font-size: 8px;
+    margin-top: 11px;
+  }
+  .route-preview {
+    margin-bottom: 10px;
+    font-size: 9px;
+    line-height: 1.5;
+  }
+  .route-preview small {
+    font-size: 8px;
+  }
+  .world-bottom {
+    margin-top: 15px;
+    overflow: hidden;
+  }
+  .world-location-list {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 0 0 6px;
+    gap: 6px;
+    scrollbar-width: thin;
+  }
+  .world-location-list > button {
+    font-size: 8px;
+    padding: 11px 12px;
+    white-space: nowrap;
+    min-height: 37px;
+    gap: 6px;
+  }
+  .world-location-list > button > span {
+    font-size: 7px;
+  }
+  .world-status {
+    font-size: 7px;
+    line-height: 1.8;
+    margin-top: 8px;
+    min-height: 15px;
+  }
+  .location-panorama {
+    height: 270px;
+  }
+  .location-panorama-title {
+    left: 23px;
+    right: 20px;
+    bottom: 24px;
+  }
+  .location-panorama-title > .eyebrow {
+    font-size: 6px;
+    letter-spacing: 1.5px;
+  }
+  .location-panorama-title h2 {
+    font-size: 31px;
+    margin: 13px 0 10px;
+    letter-spacing: -0.8px;
+  }
+  .location-panorama-title > span:last-child {
+    font-size: 13px;
+  }
+  .location-scene-content {
+    grid-template-columns: 1fr;
+    gap: 27px;
+    padding: 23px 23px 29px;
+  }
+  .location-story > p {
+    font-size: 12px;
+    margin-bottom: 18px;
+  }
+  .location-scene-note {
+    font-size: 9px;
+  }
+  .location-story > .eyebrow {
+    font-size: 7px;
+  }
+  .location-pois > .eyebrow {
+    font-size: 7px;
+  }
+  .poi-tabs > button {
+    font-size: 11px;
+    min-height: 41px;
+  }
+  .poi-description {
+    font-size: 11px;
+    line-height: 1.9;
+    min-height: 50px;
+  }
+  .journal-content {
+    padding: 38px 23px 26px;
+  }
+  .journal-content h2 {
+    font-size: 28px;
+    margin-top: 19px;
+  }
+  .journal-content > p {
+    font-size: 11px;
+  }
+  .journal-progress {
+    margin: 21px 0;
+  }
+  .journal-locations > button {
+    gap: 10px;
+    padding: 7px;
+    min-height: 61px;
+  }
+  .journal-locations img {
+    width: 65px;
+    height: 45px;
+  }
+  .journal-locations strong {
+    font-size: 11px;
+  }
+  .journal-locations small {
+    font-size: 5px;
+    letter-spacing: 1.2px;
+  }
+  .journal-unvisited {
+    font-size: 6px;
+    white-space: nowrap;
+    margin-right: 4px;
+  }
+  .journal-reset {
+    font-size: 10px;
+  }
+  .journal-note {
+    font-size: 8px;
+    line-height: 1.8;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .world-plane {
+    will-change: auto;
+  }
+  .world-cloud,
+  .map-node.is-current .map-node-ring:before,
+  .is-sailing .ship-wake,
+  .planned-route.is-sailing,
+  .island-panel-image img {
+    animation: none !important;
+  }
+}
