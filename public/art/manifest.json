@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "era": "East Blue",
+  "generator": "built-in image_gen",
+  "createdAt": "2026-10-07",
+  "reviewStatus": "integrated-awaiting-owner-art-direction-review",
+  "assets": [
+    {
+      "characterId": "luffy",
+      "image": "/art/luffy.webp",
+      "source": "assets/source-art/luffy.png",
+      "width": 900,
+      "height": 1350,
+      "crop": "50% 28%"
+    },
+    {
+      "characterId": "zoro",
+      "image": "/art/zoro.webp",
+      "source": "assets/source-art/zoro.png",
+      "width": 900,
+      "height": 1350,
+      "crop": "50% 28%"
+    },
+    {
+      "characterId": "nami",
+      "image": "/art/nami.webp",
+      "source": "assets/source-art/nami.png",
+      "width": 900,
+      "height": 1350,
+      "crop": "50% 28%"
+    }
+  ]
+}
