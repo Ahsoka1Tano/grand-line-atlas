@@ -3,13 +3,21 @@
 import {
   useCallback,
   useEffect,
+  useLayoutEffect,
   useRef,
   useState,
   type RefObject,
   type PointerEvent,
   type KeyboardEvent,
 } from "react";
-import { clampCamera, fitScale, initialCamera, zoomCamera, type Viewport } from "./navigation";
+import {
+  clampCamera,
+  fitScale,
+  focusCamera,
+  initialCamera,
+  zoomCamera,
+  type Viewport,
+} from "./navigation";
 
 type Point = { x: number; y: number };
 const distance = (points: Point[]) =>
@@ -23,11 +31,19 @@ export function useMapCamera(ref: RefObject<HTMLDivElement | null>) {
   const [viewport, setViewport] = useState<Viewport>({ width: 1000, height: 630 });
   const [camera, setCamera] = useState(initialCamera);
   const [dragging, setDragging] = useState(false);
+  const [measured, setMeasured] = useState(false);
   const pointers = useRef(new Map<number, Point>());
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = ref.current;
     if (!element) return;
+    const bounds = element.getBoundingClientRect();
+    if (bounds.width && bounds.height) {
+      const size = { width: bounds.width, height: bounds.height };
+      setViewport(size);
+      setCamera((current) => clampCamera(current, size));
+      setMeasured(true);
+    }
     const observer = new ResizeObserver(([entry]) => {
       const next = { width: entry.contentRect.width, height: entry.contentRect.height };
       if (!next.width || !next.height) return;
@@ -57,6 +73,11 @@ export function useMapCamera(ref: RefObject<HTMLDivElement | null>) {
   }, [ref, viewport]);
 
   const reset = useCallback(() => setCamera(initialCamera), []);
+  const focusRect = useCallback(
+    (bounds: { x: number; y: number; width: number; height: number }) =>
+      setCamera(focusCamera(viewport, bounds)),
+    [viewport],
+  );
   const zoomBy = useCallback(
     (factor: number) =>
       setCamera((current) => zoomCamera(current, viewport, current.zoom * factor)),
@@ -144,9 +165,11 @@ export function useMapCamera(ref: RefObject<HTMLDivElement | null>) {
 
   return {
     camera,
+    measured,
     scale: fitScale(viewport) * camera.zoom,
     dragging,
     reset,
+    focusRect,
     zoomBy,
     controls: {
       onPointerDown,

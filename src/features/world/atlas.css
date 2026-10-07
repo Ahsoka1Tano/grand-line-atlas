@@ -1,0 +1,531 @@
+.atlas-experience .atlas-overview {
+  grid-template-columns: 1fr;
+}
+.atlas-experience .atlas-frame {
+  background: #e9d0a0 url("/world/atlas-parchment.webp") center/cover;
+  border-color: #8c7450;
+  border-radius: 5px;
+}
+.atlas-experience .atlas-frame:after {
+  box-shadow:
+    inset 0 0 50px #6d3c252e,
+    inset 0 0 0 4px #4f382e21;
+  border-radius: 4px;
+}
+.atlas-chart {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  font-family: Georgia, "Times New Roman", serif;
+  pointer-events: none;
+}
+.atlas-neatline {
+  fill: none;
+  stroke: #78522c;
+  stroke-width: 3;
+  opacity: 0.68;
+}
+.atlas-inner-neatline {
+  fill: none;
+  stroke: #89633c;
+  stroke-width: 1;
+  opacity: 0.6;
+}
+.atlas-longitudes {
+  fill: none;
+  stroke: #705236;
+  stroke-width: 1;
+  stroke-dasharray: 3 8;
+  opacity: 0.18;
+}
+.red-line-land {
+  fill: #b67450;
+  fill-opacity: 0.6;
+  stroke: #944d30;
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+.atlas-seas > path {
+  fill: #f5dfac;
+  fill-opacity: 0.58;
+  stroke: #a86a42;
+  stroke-width: 2.3;
+  stroke-linejoin: round;
+}
+.calm-belts > path:first-child {
+  fill: #78958a;
+  fill-opacity: 0.12;
+  stroke: #677b63;
+  stroke-width: 1.2;
+  stroke-dasharray: 8 5;
+}
+.grand-line-band {
+  fill: #efd6a1;
+  fill-opacity: 0.82;
+  stroke: #936d3e;
+  stroke-width: 1.5;
+}
+.atlas-current-lines {
+  fill: none;
+  stroke: #806344;
+  stroke-width: 1.5;
+  stroke-dasharray: 16 17;
+  opacity: 0.35;
+  animation: atlasCurrentFlow 22s linear infinite;
+}
+.reverse-mountain > path:first-child {
+  fill: #e9cc98;
+  stroke: #734d2e;
+  stroke-width: 2.5;
+}
+.reverse-mountain .mountain-stream {
+  fill: none;
+  stroke: #557f81;
+  stroke-width: 9;
+  stroke-linecap: round;
+  opacity: 0.66;
+}
+.reverse-mountain .mountain-peaks {
+  fill: #aa7956;
+  fill-opacity: 0.65;
+  stroke: #704d30;
+  stroke-width: 2;
+}
+.reverse-mountain text {
+  font-size: 21px;
+  font-style: italic;
+  fill: #50331c;
+}
+.atlas-island {
+  fill: #d4b987;
+  fill-opacity: 0.65;
+  stroke: #7e5b35;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.active-island {
+  fill: #ddc190;
+  stroke: #755032;
+  stroke-width: 2.3;
+}
+.island-contour {
+  fill: none;
+  stroke: #8e744f;
+  stroke-width: 1.2;
+  opacity: 0.55;
+}
+.island-hills {
+  fill: none;
+  stroke: #8a6b43;
+  stroke-width: 1;
+  opacity: 0.65;
+  stroke-linecap: round;
+}
+.atlas-islands text {
+  font-size: 18px;
+  fill: #634627;
+  font-style: italic;
+}
+.grand-line-islands text {
+  font-size: 17px;
+  fill: #573b22;
+  font-style: italic;
+}
+.atlas-region-names text {
+  font-size: 47px;
+  font-style: italic;
+  fill: #513822;
+  letter-spacing: 1px;
+}
+.atlas-region-names .red-line-title {
+  font-size: 32px;
+  fill: #794128;
+  letter-spacing: 6px;
+  font-style: normal;
+}
+.atlas-region-names .lower {
+  font-size: 26px;
+  letter-spacing: 5px;
+  opacity: 0.8;
+}
+.atlas-band-labels text {
+  fill: #694a29;
+  font-size: 21px;
+  letter-spacing: 1.2px;
+}
+.atlas-band-labels text:nth-last-child(-n + 2) {
+  font-size: 18px;
+  fill: #50695e;
+  font-style: italic;
+  letter-spacing: 0.2px;
+}
+.atlas-rose {
+  fill: none;
+  stroke: #745634;
+  stroke-width: 1.8;
+}
+.atlas-rose .rose-dark {
+  fill: #7d5c34;
+  fill-opacity: 0.8;
+}
+.atlas-rose .rose-light {
+  fill: #ead3a1;
+  stroke: #745634;
+}
+.atlas-rose text {
+  fill: #6d4e2c;
+  stroke: none;
+  font-size: 19px;
+}
+.atlas-cartouche path {
+  fill: #edd5a3;
+  fill-opacity: 0.63;
+  stroke: #8a6740;
+  stroke-width: 1.5;
+}
+.atlas-cartouche text {
+  font-size: 27px;
+  letter-spacing: 5px;
+  fill: #644528;
+}
+.atlas-cartouche .cartouche-sub {
+  font-size: 13px;
+  letter-spacing: 3px;
+  fill: #8d6b44;
+}
+.atlas-scale-bar {
+  stroke: #785b3c;
+  stroke-width: 2;
+  fill: none;
+}
+.atlas-scale-bar text {
+  fill: #755430;
+  font-size: 14px;
+  letter-spacing: 2px;
+  stroke: none;
+}
+.engraved-ship {
+  fill: none;
+  stroke: #74502e;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.engraved-ship .ship-hull {
+  fill: #805d39;
+  fill-opacity: 0.45;
+}
+.engraved-ship .ship-sails {
+  fill: #efddba;
+  fill-opacity: 0.9;
+}
+.engraved-ship .ship-flag {
+  fill: #9e6944;
+  fill-opacity: 0.65;
+}
+.atlas-small-label {
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-style: italic;
+  fill: #6c4828;
+}
+.atlas-roaming-ship {
+  opacity: 0.9;
+}
+.atlas-whirlpools {
+  fill: none;
+  stroke: #8b6b42;
+  stroke-width: 2;
+  opacity: 0.55;
+}
+.atlas-east-blue-portal {
+  position: absolute;
+  z-index: 6;
+  transform: translate(-50%, -50%) scale(calc(1 / var(--map-scale)));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 7px 12px;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 20px;
+  color: #594127;
+  white-space: nowrap;
+  border-bottom: 1px dashed #99734b8c;
+  transition:
+    color 0.2s,
+    background 0.2s;
+  border-radius: 3px;
+}
+.atlas-east-blue-portal:hover {
+  color: #8b5129;
+  background: #fff0c47a;
+}
+.scope-world .atlas-region-names text:nth-child(2) {
+  visibility: hidden;
+}
+.atlas-scope-controls {
+  position: absolute;
+  z-index: 10;
+  right: 18px;
+  top: 44px;
+  display: flex;
+  border: 1px solid #8b6d4855;
+  background: #f5e4bedb;
+  backdrop-filter: blur(6px);
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px #61371710;
+}
+.atlas-scope-controls > button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 13px;
+  font-size: 9px;
+  min-height: 36px;
+  color: #85694b;
+}
+.atlas-scope-controls > button.selected {
+  background: #957343;
+  color: #fff0cf;
+}
+.atlas-scope-controls > button:hover:not(:disabled):not(.selected) {
+  background: #e5ca9a;
+  color: #694722;
+}
+.atlas-scope-controls > button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.atlas-experience .atlas-topline {
+  color: #795a39;
+}
+.atlas-experience .atlas-current {
+  color: #735a3b !important;
+}
+.atlas-experience .atlas-bottomline {
+  color: #785e3e;
+}
+.atlas-experience .atlas-bottomline > span:last-child {
+  color: #8b755a;
+}
+.atlas-experience .chart-dot {
+  background: #8b714c;
+  box-shadow: none;
+}
+.atlas-experience .atlas-compass {
+  display: none;
+}
+.atlas-experience .map-zoom-controls {
+  border-color: #94744666;
+  color: #735633;
+  background: #f1dfb9e6;
+  box-shadow: 0 3px 14px #76543318;
+}
+.atlas-experience .map-zoom-controls > button:hover:not(:disabled) {
+  background: #d9bd86;
+  color: #5d3b1d;
+}
+.atlas-experience .map-zoom-controls > .zoom-divider {
+  background: #8f6d4444;
+}
+.atlas-experience .map-viewport:focus-visible {
+  box-shadow: inset 0 0 0 2px #946b36;
+}
+.atlas-experience .sea-route {
+  stroke: #8e755291;
+  stroke-width: 1.6;
+  stroke-dasharray: 4 8;
+}
+.atlas-experience .planned-route {
+  stroke: #876035;
+  stroke-width: 2.5;
+  stroke-dasharray: 7 7;
+}
+.atlas-experience .planned-route-glow {
+  stroke: #c5985755;
+  stroke-width: 7;
+}
+.atlas-experience .port-dot {
+  fill: #7e603f;
+  stroke: #f8e4bb;
+}
+.atlas-experience .map-node {
+  color: #73512e;
+}
+.atlas-experience .map-node-ring {
+  color: #73512e;
+  background: #f6e4bcdd;
+  border-color: #9d7951;
+  box-shadow: 0 2px 10px #4d301b22;
+}
+.atlas-experience .map-node.is-visited .map-node-ring {
+  color: #587366;
+  border-color: #7c8d6c;
+}
+.atlas-experience .map-node.is-selected .map-node-ring {
+  color: #6a421c;
+  background: #e1c18adb;
+  border-color: #8c602e;
+  box-shadow:
+    0 0 0 4px #98703c18,
+    0 2px 10px #4d301b22;
+}
+.atlas-experience .map-node:hover .map-node-ring {
+  color: #694320;
+  background: #f9e8c6;
+  box-shadow: 0 0 0 4px #98703c18;
+}
+.atlas-experience .map-node.is-current .map-node-ring:before {
+  border-color: #84613d55;
+}
+.atlas-experience .map-node-label {
+  font-family: Georgia, serif;
+  font-size: 12px;
+  color: #66482a;
+  text-shadow: none;
+  background: #f3dfb3d1;
+  border: 1px solid #a7805433;
+  box-shadow: 0 2px 7px #6f492511;
+  font-weight: 400;
+}
+.atlas-experience .map-node-label > span {
+  color: #93764f;
+  font-size: 5px;
+}
+.atlas-experience .map-node.is-selected .map-node-label {
+  color: #68451d;
+  background: #e9d09eec;
+  border-color: #9a784855;
+}
+.atlas-experience .map-ship {
+  color: #6e4d2a;
+  background: #f2ddb4bd;
+  border-color: #87684099;
+  box-shadow: 0 0 17px #99744122;
+}
+.atlas-experience .ship-caption {
+  color: #745231;
+  text-shadow: none;
+  font-weight: 700;
+}
+.atlas-experience .ship-wake {
+  border-color: #71928a55;
+}
+.atlas-experience .voyage-hud {
+  background: #f4e4c0ef;
+  border-color: #aa875c66;
+  box-shadow: 0 4px 18px #8e603821;
+  color: #674626;
+}
+.atlas-experience .voyage-hud-icon {
+  color: #8b6437;
+}
+.atlas-experience .voyage-hud > div > span {
+  color: #9b7b52;
+}
+.atlas-experience .voyage-hud > button {
+  color: #947959;
+}
+.atlas-experience .voyage-hud > button:hover {
+  color: #593b1d;
+}
+.atlas-experience .voyage-progress {
+  background: #a4885633;
+}
+.atlas-experience .voyage-progress > i {
+  background: #97703d;
+}
+.atlas-experience .world-atlas-note {
+  color: #79694b;
+}
+.atlas-experience .world-status {
+  color: #869993;
+}
+@keyframes atlasCurrentFlow {
+  to {
+    stroke-dashoffset: -330;
+  }
+}
+@media (max-width: 1100px) {
+  .atlas-scope-controls {
+    right: 14px;
+  }
+  .atlas-scope-controls > button {
+    padding: 8px 11px;
+    font-size: 8px;
+  }
+  .atlas-east-blue-portal {
+    font-size: 17px;
+  }
+  .atlas-experience .map-node-label {
+    font-size: 11px;
+  }
+}
+@media (max-width: 650px) {
+  .scope-world .atlas-frame {
+    height: 355px;
+  }
+  .atlas-scope-controls {
+    right: 12px;
+    top: 40px;
+  }
+  .atlas-scope-controls > button {
+    font-size: 8px;
+    min-height: 34px;
+    gap: 5px;
+    padding: 8px 10px;
+  }
+  .atlas-east-blue-portal {
+    font-size: 14px;
+    padding: 6px 8px;
+    gap: 5px;
+  }
+  .atlas-east-blue-portal > svg {
+    width: 10px;
+  }
+  .atlas-experience .map-node-label {
+    font-size: 10px;
+    padding: 5px 7px;
+  }
+  .atlas-experience .map-node-label > span {
+    font-size: 4px;
+  }
+  .atlas-experience .map-zoom-controls {
+    bottom: 38px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .atlas-current-lines {
+    animation: none !important;
+  }
+}
+.atlas-landmark {
+  fill: none;
+  stroke: #73502f;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.atlas-landmark .landmark-paper {
+  fill: #f1dfb7;
+  fill-opacity: 0.85;
+}
+.atlas-landmark .landmark-ground {
+  stroke-width: 1;
+  opacity: 0.6;
+}
+.atlas-windmill-rotor {
+  transform-origin: 0 0;
+  animation: atlasWindmill 26s linear infinite;
+}
+@keyframes atlasWindmill {
+  to {
+    transform: rotate(360deg);
+  }
+}

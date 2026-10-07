@@ -1,5 +1,7 @@
-export const WORLD_WIDTH = 1600;
-export const WORLD_HEIGHT = 1067;
+export const WORLD_WIDTH = 2400;
+export const WORLD_HEIGHT = 1600;
+
+export const EAST_BLUE_BOUNDS = { x: 1430, y: 120, width: 900, height: 550 };
 
 export type WorldLocation = {
   id: string;
@@ -27,9 +29,9 @@ export const worldLocations: WorldLocation[] = [
     kind: "village",
     subtitle: "Там, где рождается мечта",
     image: "/world/foosha.webp",
-    x: 350,
-    y: 696,
-    port: { x: 485, y: 801 },
+    x: 1760,
+    y: 305,
+    port: { x: 1780, y: 355 },
     accent: "#b9d594",
     description:
       "Тихая гавань, ветряная мельница и океан до самого горизонта. Даже самое большое путешествие начинается с небольшого причала.",
@@ -61,9 +63,9 @@ export const worldLocations: WorldLocation[] = [
     kind: "navy",
     subtitle: "За стенами морской базы",
     image: "/world/shells-town.webp",
-    x: 405,
-    y: 250,
-    port: { x: 580, y: 390 },
+    x: 2095,
+    y: 270,
+    port: { x: 2065, y: 315 },
     accent: "#8ab6d4",
     description:
       "Белые башни Дозора возвышаются над портовым городом. Под безупречным порядком скрываются истории тех, кто выбрал собственный путь.",
@@ -95,9 +97,9 @@ export const worldLocations: WorldLocation[] = [
     kind: "town",
     subtitle: "Город с характером",
     image: "/world/orange-town.webp",
-    x: 854,
-    y: 474,
-    port: { x: 820, y: 600 },
+    x: 2190,
+    y: 505,
+    port: { x: 2205, y: 555 },
     accent: "#e7a478",
     description:
       "Черепичные крыши, узкие улочки и яркий шатёр на фоне моря. За весёлой декорацией здесь всегда чувствуется пиратская авантюра.",
@@ -129,9 +131,9 @@ export const worldLocations: WorldLocation[] = [
     kind: "restaurant",
     subtitle: "Лучший стол посреди океана",
     image: "/world/baratie.webp",
-    x: 1175,
-    y: 708,
-    port: { x: 1150, y: 850 },
+    x: 1870,
+    y: 505,
+    port: { x: 1850, y: 550 },
     accent: "#dfc28f",
     description:
       "Плавучий ресторан с зелёной крышей и рыбой на носу. Здесь даже среди открытого моря можно найти тёплый свет, горячий ужин и новую встречу.",
@@ -163,9 +165,9 @@ export const worldLocations: WorldLocation[] = [
     kind: "stronghold",
     subtitle: "За спокойствием — буря",
     image: "/world/arlong-park.webp",
-    x: 1280,
-    y: 250,
-    port: { x: 1260, y: 449 },
+    x: 1585,
+    y: 435,
+    port: { x: 1580, y: 488 },
     accent: "#88c2b4",
     description:
       "Высокие стены, тропические сады и дворец у самой воды. Этот берег красив, но его тишина совсем не похожа на тишину родной гавани.",

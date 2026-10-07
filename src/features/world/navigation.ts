@@ -9,11 +9,31 @@ import {
 export type Camera = { zoom: number; x: number; y: number };
 export type Viewport = { width: number; height: number };
 export const MIN_ZOOM = 0.85;
-export const MAX_ZOOM = 2.8;
+export const MAX_ZOOM = 6;
 export const initialCamera: Camera = { zoom: 1, x: 0, y: 0 };
 
 export function fitScale(viewport: Viewport) {
-  return Math.min(viewport.width / WORLD_WIDTH, viewport.height / WORLD_HEIGHT) * 1.13;
+  return Math.min(viewport.width / WORLD_WIDTH, viewport.height / WORLD_HEIGHT) * 0.97;
+}
+
+export function focusCamera(
+  viewport: Viewport,
+  bounds: { x: number; y: number; width: number; height: number },
+): Camera {
+  const zoom = Math.min(
+    MAX_ZOOM,
+    (Math.min(viewport.width / bounds.width, viewport.height / bounds.height) * 0.88) /
+      fitScale(viewport),
+  );
+  const scale = fitScale(viewport) * zoom;
+  return clampCamera(
+    {
+      zoom,
+      x: (WORLD_WIDTH / 2 - bounds.x - bounds.width / 2) * scale,
+      y: (WORLD_HEIGHT / 2 - bounds.y - bounds.height / 2) * scale,
+    },
+    viewport,
+  );
 }
 
 export function clampCamera(camera: Camera, viewport: Viewport): Camera {

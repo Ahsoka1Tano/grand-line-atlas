@@ -27,6 +27,7 @@ import { Modal } from "@/components/modal";
 import {
   WORLD_WIDTH,
   WORLD_HEIGHT,
+  EAST_BLUE_BOUNDS,
   locationById,
   worldConnections,
   worldLocations,
@@ -35,7 +36,9 @@ import {
 import { getRoute, routePath, MAX_ZOOM, MIN_ZOOM } from "./navigation";
 import { useMapCamera } from "./use-map-camera";
 import { LocationScene } from "./location-scene";
+import { AtlasChart } from "./atlas-chart";
 import "./world.css";
+import "./atlas.css";
 
 const typeLabels: Record<WorldLocation["kind"], string> = {
   village: "Деревня",
@@ -55,6 +58,7 @@ type Journey = { destination: string; route: string[]; path: string; progress: n
 const start = worldLocations[0];
 
 export function WorldExperience() {
+  const [atlasScope, setAtlasScope] = useState<"world" | "east-blue">("world");
   const [selectedId, setSelectedId] = useState(start.id);
   const [currentId, setCurrentId] = useState(start.id);
   const [visited, setVisited] = useState<string[]>([start.id]);
@@ -75,6 +79,16 @@ export function WorldExperience() {
   const previewPath = routePath(previewRoute);
   const activePath = journey?.path ?? previewPath;
   const activeRoute = journey?.route ?? previewRoute;
+
+  useEffect(() => {
+    if (atlasScope === "world") camera.reset();
+    else camera.focusRect(EAST_BLUE_BOUNDS);
+  }, [atlasScope, camera.focusRect, camera.reset]);
+
+  const selectLocation = (id: string) => {
+    setSelectedId(id);
+    setAtlasScope("east-blue");
+  };
 
   useEffect(() => {
     try {
@@ -149,7 +163,7 @@ export function WorldExperience() {
 
   const sail = () => {
     if (journey || selectedId === currentId || previewRoute.length < 2) return;
-    camera.reset();
+    camera.focusRect(EAST_BLUE_BOUNDS);
     setStatus("");
     setJourney({ destination: selectedId, route: previewRoute, path: previewPath, progress: 0 });
   };
@@ -159,6 +173,7 @@ export function WorldExperience() {
     setStatus("Курс отменён. Корабль остаётся у прежнего причала.");
   };
   const resetJourney = () => {
+    setAtlasScope("world");
     setJourney(null);
     setCurrentId(start.id);
     setSelectedId(start.id);
@@ -170,15 +185,16 @@ export function WorldExperience() {
   };
 
   return (
-    <div className="world-experience">
+    <div className={`world-experience atlas-experience scope-${atlasScope}`}>
       <header className="world-heading">
         <div>
           <span className="eyebrow">
             <span className="little-diamond" />
-            ТВОЙ АТЛАС ПРИКЛЮЧЕНИЙ
+            МОРСКОЙ АТЛАС · ПЕРВЫЙ ТОМ
           </span>
           <h1>
-            Восточное море<span>East Blue</span>
+            {atlasScope === "world" ? "Атлас мира" : "Восточное море"}
+            <span>{atlasScope === "world" ? "One Piece" : "East Blue"}</span>
           </h1>
         </div>
         <button className="button subtle journal-button" onClick={() => setJournalOpen(true)}>
@@ -186,25 +202,48 @@ export function WorldExperience() {
           Журнал капитана<span>{visited.length} / 5</span>
         </button>
       </header>
-      <div className="world-layout">
+      <div className={`world-layout ${atlasScope === "world" ? "atlas-overview" : ""}`}>
         <div className="atlas-frame">
           <div className="atlas-topline" data-map-control>
             <span>
               <Compass size={12} />
-              EAST BLUE <span>/</span> CHAPTER 01
+              {atlasScope === "world" ? "WORLD CHART" : "EAST BLUE"} <span>/</span> VOLUME I
             </span>
             <span className="atlas-current">
               <Anchor size={11} />
               {journey ? "В открытом море" : current.name}
             </span>
           </div>
+          <div className="atlas-scope-controls" data-map-control>
+            <button
+              className={atlasScope === "world" ? "selected" : ""}
+              disabled={!!journey}
+              onClick={() => setAtlasScope("world")}
+            >
+              <Compass size={13} />
+              Весь мир
+            </button>
+            <button
+              className={atlasScope === "east-blue" ? "selected" : ""}
+              disabled={!!journey}
+              onClick={() => setAtlasScope("east-blue")}
+            >
+              <MapPin size={13} />
+              East Blue
+            </button>
+          </div>
           <div
             ref={viewportRef}
             className={`map-viewport ${camera.dragging ? "is-dragging" : ""}`}
             tabIndex={0}
             role="region"
-            aria-label="Интерактивная карта East Blue. Стрелки перемещают карту, плюс и минус меняют масштаб, Home возвращает обзор."
+            aria-label="Интерактивный атлас One Piece. Стрелки перемещают карту, плюс и минус меняют масштаб, Home возвращает обзор."
             {...camera.controls}
+            onKeyDown={(event) => {
+              camera.controls.onKeyDown(event);
+              if (event.key === "Home" && event.target === event.currentTarget && !journey)
+                setAtlasScope("world");
+            }}
           >
             <div
               className="world-plane"
@@ -212,110 +251,111 @@ export function WorldExperience() {
                 {
                   width: WORLD_WIDTH,
                   height: WORLD_HEIGHT,
+                  opacity: camera.measured ? 1 : 0,
                   transform: `translate(calc(-50% + ${camera.camera.x}px), calc(-50% + ${camera.camera.y}px)) scale(${camera.scale})`,
                   "--map-scale": camera.scale,
                 } as CSSProperties
               }
             >
-              <Image
-                className="world-map-art"
-                src="/world/east-blue.webp"
-                alt="Иллюстрированная карта пяти локаций East Blue"
-                fill
-                sizes="(max-width: 650px) 900px, 1536px"
-                loading="eager"
-                fetchPriority="high"
-                draggable={false}
-              />
-              <div className="world-ocean-shade" />
-              <div className="world-cloud world-cloud-one" />
-              <div className="world-cloud world-cloud-two" />
-              <svg
-                className="world-routes"
-                viewBox={`0 0 ${WORLD_WIDTH} ${WORLD_HEIGHT}`}
-                aria-hidden="true"
-              >
-                <defs>
-                  <filter id="route-glow">
-                    <feGaussianBlur stdDeviation="3" />
-                  </filter>
-                </defs>
-                {worldConnections.map((edge) => (
-                  <path
-                    key={`${edge.from}-${edge.to}`}
-                    d={routePath([edge.from, edge.to])}
-                    className="sea-route"
-                  />
-                ))}
-                {activeRoute.length > 1 && (
-                  <>
-                    <path d={activePath} className="planned-route-glow" filter="url(#route-glow)" />
-                    <path
-                      ref={routeRef}
-                      d={activePath}
-                      className={`planned-route ${journey ? "is-sailing" : ""}`}
-                    />
-                  </>
-                )}
-                {worldLocations.map((location) => (
-                  <circle
-                    key={location.id}
-                    cx={location.port.x}
-                    cy={location.port.y}
-                    r="4"
-                    className="port-dot"
-                  />
-                ))}
-              </svg>
-              <span className="sea-label sea-label-main" aria-hidden="true">
-                EAST BLUE
-              </span>
-              <span className="sea-label sea-label-sub" aria-hidden="true">
-                THE SEA OF BEGINNINGS
-              </span>
-              {worldLocations.map((location) => {
-                const Icon = typeIcons[location.kind];
-                const isSelected = selectedId === location.id;
-                const isVisited = visited.includes(location.id);
-                return (
-                  <button
-                    key={location.id}
-                    className={`map-node ${isSelected ? "is-selected" : ""} ${isVisited ? "is-visited" : ""} ${currentId === location.id ? "is-current" : ""}`}
-                    style={
-                      {
-                        left: location.x,
-                        top: location.y,
-                        "--island-accent": location.accent,
-                      } as CSSProperties
-                    }
-                    aria-label={`Выбрать локацию: ${location.name}`}
-                    aria-pressed={isSelected}
-                    onClick={() => setSelectedId(location.id)}
+              <AtlasChart motion={!reducedMotion} regional={atlasScope === "east-blue"} />
+              {atlasScope === "world" && (
+                <button
+                  className="atlas-east-blue-portal"
+                  style={{ left: 1840, top: 160 }}
+                  aria-label="Исследовать East Blue"
+                  onClick={() => setAtlasScope("east-blue")}
+                >
+                  East Blue <ArrowRight size={12} />
+                </button>
+              )}
+              {atlasScope === "east-blue" && (
+                <>
+                  <svg
+                    className="world-routes"
+                    viewBox={`0 0 ${WORLD_WIDTH} ${WORLD_HEIGHT}`}
+                    aria-hidden="true"
                   >
-                    <span className="map-node-ring">
-                      <Icon size={17} />
-                      {isVisited && (
-                        <span className="node-check">
-                          <Check size={8} />
+                    <defs>
+                      <filter id="route-glow">
+                        <feGaussianBlur stdDeviation="3" />
+                      </filter>
+                    </defs>
+                    {worldConnections.map((edge) => (
+                      <path
+                        key={`${edge.from}-${edge.to}`}
+                        d={routePath([edge.from, edge.to])}
+                        className="sea-route"
+                      />
+                    ))}
+                    {activeRoute.length > 1 && (
+                      <>
+                        <path
+                          d={activePath}
+                          className="planned-route-glow"
+                          filter="url(#route-glow)"
+                        />
+                        <path
+                          ref={routeRef}
+                          d={activePath}
+                          className={`planned-route ${journey ? "is-sailing" : ""}`}
+                        />
+                      </>
+                    )}
+                    {worldLocations.map((location) => (
+                      <circle
+                        key={location.id}
+                        cx={location.port.x}
+                        cy={location.port.y}
+                        r="4"
+                        className="port-dot"
+                      />
+                    ))}
+                  </svg>
+                  {worldLocations.map((location) => {
+                    const Icon = typeIcons[location.kind];
+                    const isSelected = selectedId === location.id;
+                    const isVisited = visited.includes(location.id);
+                    return (
+                      <button
+                        key={location.id}
+                        className={`map-node ${isSelected ? "is-selected" : ""} ${isVisited ? "is-visited" : ""} ${currentId === location.id ? "is-current" : ""}`}
+                        style={
+                          {
+                            left: location.x,
+                            top: location.y,
+                            "--island-accent": location.accent,
+                          } as CSSProperties
+                        }
+                        aria-label={`Выбрать локацию: ${location.name}`}
+                        aria-pressed={isSelected}
+                        onClick={() => selectLocation(location.id)}
+                      >
+                        <span className="map-node-ring">
+                          <Icon size={17} />
+                          {isVisited && (
+                            <span className="node-check">
+                              <Check size={8} />
+                            </span>
+                          )}
                         </span>
-                      )}
-                    </span>
-                    <span className="map-node-label">
-                      {location.name}
-                      <span>{location.latinName}</span>
-                    </span>
-                  </button>
-                );
-              })}
-              <div
-                className={`map-ship ${journey ? "is-sailing" : ""}`}
-                style={{ left: shipPosition.x, top: shipPosition.y }}
-                aria-hidden="true"
-              >
-                <span className="ship-wake" />
-                <Sailboat size={23} strokeWidth={1.6} />
-                <span className="ship-caption">{journey ? "В ПУТИ" : "ТВОЙ КОРАБЛЬ"}</span>
-              </div>
+                        <span className="map-node-label">
+                          {location.name}
+                          <span>{location.latinName}</span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                  <div
+                    className={`map-ship ${journey ? "is-sailing" : ""}`}
+                    style={{ left: shipPosition.x, top: shipPosition.y }}
+                    aria-hidden="true"
+                  >
+                    <span className="ship-wake" />
+                    <Sailboat size={23} strokeWidth={1.6} />
+                    <span className="ship-caption">{journey ? "В ПУТИ" : "ТВОЙ КОРАБЛЬ"}</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
           <div className="atlas-compass" aria-hidden="true">
@@ -339,7 +379,16 @@ export function WorldExperience() {
               <Minus size={17} />
             </button>
             <span className="zoom-divider" />
-            <button aria-label="Показать всю карту" onClick={camera.reset}>
+            <button
+              aria-label="Показать всю карту"
+              onClick={() => {
+                if (journey) camera.focusRect(EAST_BLUE_BOUNDS);
+                else {
+                  setAtlasScope("world");
+                  camera.reset();
+                }
+              }}
+            >
               <Maximize size={16} />
             </button>
           </div>
@@ -370,87 +419,89 @@ export function WorldExperience() {
             </span>
           </div>
         </div>
-        <aside className="island-panel" aria-label="Выбранная локация">
-          <div className="island-panel-image">
-            <Image
-              key={selected.image}
-              src={selected.image}
-              alt={`Берег: ${selected.name}`}
-              fill
-              sizes="(max-width: 650px) 100vw, 340px"
-              loading="eager"
-            />
-            <div className="island-panel-image-shade" />
-            <span className="island-number">
-              {selected.number}
-              <span>/ EAST BLUE</span>
-            </span>
-            <span className={`island-status ${currentId === selectedId ? "here" : ""}`}>
-              <CircleDot size={10} />
-              {currentId === selectedId
-                ? "Ты здесь"
-                : visited.includes(selectedId)
-                  ? "В твоём журнале"
-                  : "Новый берег"}
-            </span>
-          </div>
-          <div className="island-panel-copy">
-            <span className="eyebrow subdued">
-              <SelectedIcon size={12} />
-              {typeLabels[selected.kind]}
-            </span>
-            <h2>{selected.name}</h2>
-            <span className="island-subtitle">{selected.subtitle}</span>
-            <p className="island-description">{selected.description}</p>
-            <div className="island-points">
-              <span className="eyebrow subdued">МЕСТА НА БЕРЕГУ</span>
-              {selected.points.map((point) => (
-                <div key={point.name}>
-                  <MapPin size={12} />
-                  <span>{point.name}</span>
-                </div>
-              ))}
+        {atlasScope === "east-blue" && (
+          <aside className="island-panel" aria-label="Выбранная локация">
+            <div className="island-panel-image">
+              <Image
+                key={selected.image}
+                src={selected.image}
+                alt={`Берег: ${selected.name}`}
+                fill
+                sizes="(max-width: 650px) 100vw, 340px"
+                loading="eager"
+              />
+              <div className="island-panel-image-shade" />
+              <span className="island-number">
+                {selected.number}
+                <span>/ EAST BLUE</span>
+              </span>
+              <span className={`island-status ${currentId === selectedId ? "here" : ""}`}>
+                <CircleDot size={10} />
+                {currentId === selectedId
+                  ? "Ты здесь"
+                  : visited.includes(selectedId)
+                    ? "В твоём журнале"
+                    : "Новый берег"}
+              </span>
             </div>
-            {currentId !== selectedId && (
-              <div className="route-preview">
-                <Route size={15} />
-                <span>
-                  {current.name}
-                  <ChevronRight size={12} />
-                  {selected.name}
-                  <small>
-                    {Math.max(0, previewRoute.length - 1)}{" "}
-                    {previewRoute.length === 2 ? "морской переход" : "морских перехода"}
-                  </small>
-                </span>
+            <div className="island-panel-copy">
+              <span className="eyebrow subdued">
+                <SelectedIcon size={12} />
+                {typeLabels[selected.kind]}
+              </span>
+              <h2>{selected.name}</h2>
+              <span className="island-subtitle">{selected.subtitle}</span>
+              <p className="island-description">{selected.description}</p>
+              <div className="island-points">
+                <span className="eyebrow subdued">МЕСТА НА БЕРЕГУ</span>
+                {selected.points.map((point) => (
+                  <div key={point.name}>
+                    <MapPin size={12} />
+                    <span>{point.name}</span>
+                  </div>
+                ))}
               </div>
-            )}
-            <button
-              className="button primary island-action"
-              disabled={!!journey || !ready}
-              onClick={currentId === selectedId ? () => setSceneOpen(true) : sail}
-            >
-              {journey ? (
-                <Sailboat size={16} />
-              ) : currentId === selectedId ? (
-                <Compass size={16} />
-              ) : (
-                <Sailboat size={16} />
+              {currentId !== selectedId && (
+                <div className="route-preview">
+                  <Route size={15} />
+                  <span>
+                    {current.name}
+                    <ChevronRight size={12} />
+                    {selected.name}
+                    <small>
+                      {Math.max(0, previewRoute.length - 1)}{" "}
+                      {previewRoute.length === 2 ? "морской переход" : "морских перехода"}
+                    </small>
+                  </span>
+                </div>
               )}
-              {journey
-                ? "Корабль в пути"
-                : currentId === selectedId
-                  ? "Исследовать локацию"
-                  : "Отправиться сюда"}
-              {!journey && <ArrowRight size={15} />}
-            </button>
-            <span className="island-action-note">
-              {currentId === selectedId
-                ? "Панорама и точки интереса"
-                : "Выбери курс. Поймай попутный ветер."}
-            </span>
-          </div>
-        </aside>
+              <button
+                className="button primary island-action"
+                disabled={!!journey || !ready}
+                onClick={currentId === selectedId ? () => setSceneOpen(true) : sail}
+              >
+                {journey ? (
+                  <Sailboat size={16} />
+                ) : currentId === selectedId ? (
+                  <Compass size={16} />
+                ) : (
+                  <Sailboat size={16} />
+                )}
+                {journey
+                  ? "Корабль в пути"
+                  : currentId === selectedId
+                    ? "Исследовать локацию"
+                    : "Отправиться сюда"}
+                {!journey && <ArrowRight size={15} />}
+              </button>
+              <span className="island-action-note">
+                {currentId === selectedId
+                  ? "Панорама и точки интереса"
+                  : "Выбери курс. Поймай попутный ветер."}
+              </span>
+            </div>
+          </aside>
+        )}
       </div>
       <div className="world-bottom">
         <div className="world-location-list" role="group" aria-label="Локации East Blue">
@@ -460,7 +511,7 @@ export function WorldExperience() {
               aria-label={`Открыть на карте: ${location.name}`}
               aria-pressed={selectedId === location.id}
               className={selectedId === location.id ? "selected" : ""}
-              onClick={() => setSelectedId(location.id)}
+              onClick={() => selectLocation(location.id)}
             >
               <span>{location.number}</span>
               {location.name}
@@ -473,7 +524,10 @@ export function WorldExperience() {
         </span>
       </div>
       <p className="world-status" role="status" aria-live="polite">
-        {status || "Пять берегов. Одно море. Твоя история."}
+        {status ||
+          (atlasScope === "world"
+            ? "Четыре моря. Одна Grand Line. Твоя история."
+            : "Пять берегов. Одно море. Твоя история.")}
       </p>
       {sceneOpen && (
         <LocationScene key={selected.id} location={selected} onClose={() => setSceneOpen(false)} />
@@ -506,7 +560,7 @@ export function WorldExperience() {
                   key={location.id}
                   aria-label={`Запись журнала: ${location.name}`}
                   onClick={() => {
-                    setSelectedId(location.id);
+                    selectLocation(location.id);
                     setJournalOpen(false);
                   }}
                 >

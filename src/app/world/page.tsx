@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { CollectionExperience } from "@/features/collection/collection-experience";
 
 export const metadata: Metadata = {
-  title: "East Blue — Grand Line Atlas",
+  title: "Атлас мира — Grand Line Atlas",
   description:
-    "Исследуй авторскую карту East Blue: пять локаций, морские маршруты и твоё первое путешествие.",
+    "Анимированный морской атлас One Piece: четыре моря, Red Line, Grand Line и путешествие по East Blue.",
 };
 
 export default function WorldPage() {
