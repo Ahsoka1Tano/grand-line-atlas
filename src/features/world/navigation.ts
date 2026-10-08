@@ -9,7 +9,7 @@ import {
 export type Camera = { zoom: number; x: number; y: number };
 export type Viewport = { width: number; height: number };
 export const MIN_ZOOM = 0.85;
-export const MAX_ZOOM = 6;
+export const MAX_ZOOM = 14;
 export const initialCamera: Camera = { zoom: 1, x: 0, y: 0 };
 
 export function fitScale(viewport: Viewport) {
@@ -62,6 +62,11 @@ export function zoomCamera(
     { zoom: nextZoom, x: x - (x - camera.x) * factor, y: y - (y - camera.y) * factor },
     viewport,
   );
+}
+
+export function resizeCamera(camera: Camera, from: Viewport, to: Viewport): Camera {
+  const ratio = fitScale(to) / fitScale(from);
+  return clampCamera({ ...camera, x: camera.x * ratio, y: camera.y * ratio }, to);
 }
 
 export function getRoute(from: string, to: string): string[] {

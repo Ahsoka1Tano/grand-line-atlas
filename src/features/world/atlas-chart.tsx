@@ -1,435 +1,592 @@
-"use client";
+import { memo } from "react";
+import { atlasPlaces, atlasDetailLevel, type AtlasPlace } from "@/content/atlas";
+import { AtlasFleet } from "./atlas-fleet";
 
-type Island = {
-  x: number;
-  y: number;
-  size: number;
-  name: string;
-  shape?: number;
-  active?: boolean;
+// Red Line silhouette registered manually to Oda's early world sketch.
+// Fine coastline and relief are our illustration, not additional canon facts.
+const northRed =
+  "M960 38H1620Q1580 74 1470 84L1375 125 1400 175 1480 190 1540 165 1600 194 1680 215 1728 254 1674 283 1590 266 1555 303 1510 294 1488 339 1430 358 1380 336 1370 398 1310 437 1340 479 1300 522 1355 556 1315 599 1340 652 1295 694 1268 752 1220 805 1170 774 1130 714 1070 710 1020 680 946 685 900 642 932 611 892 569 909 524 845 512 805 476 815 426 750 421 710 389 750 355 728 312 796 275 850 268 898 231 920 176 990 161 1024 125 992 91Z";
+const southRed =
+  "M1220 837L1264 884 1320 905 1310 951 1370 980 1350 1039 1400 1085 1358 1126 1408 1170 1450 1150 1470 1200 1438 1233 1460 1264 1530 1260 1550 1305 1517 1352 1540 1395 1473 1440 1440 1490 1510 1559H954L996 1500 980 1450 1050 1414 1040 1380 1110 1340 1080 1300 1114 1260 1070 1220 1110 1170 1080 1115 1140 1070 1120 1030 1180 990 1160 937 1174 880Z";
+const leftRed =
+  "M40 38H210L174 110 194 166 148 210 174 262 148 302 194 340 170 385 216 430 181 480 222 529 175 578 218 625 192 668 232 702 205 738 256 784 188 821 230 866 202 910 244 964 191 1000 220 1046 188 1080 218 1140 186 1205 236 1270 204 1334 222 1390 181 1460 226 1559H40Z";
+const rightRed =
+  "M2360 38H2280L2310 109 2260 158 2290 203 2240 253 2280 308 2250 354 2305 390 2270 440 2310 484 2270 523 2308 560 2270 601 2315 660 2280 694 2320 743 2350 785 2310 830 2340 882 2300 928 2330 972 2280 1011 2305 1065 2260 1102 2290 1150 2235 1208 2290 1250 2250 1300 2300 1352 2270 1410 2310 1470 2280 1559H2360Z";
+const outlines: Record<string, string> = {
+  dawn: "M-68-23Q-72-48-42-48L-31-67-8-60 12-68 23-45Q60-47 65-21L49-4 69 17 48 27 51 46 29 57 11 44-7 63-27 45-51 47-45 21-69 10-58-5Z",
+  yotsuba:
+    "M-42-35Q-20-55-5-34Q24-57 38-34L27-13Q55 1 39 21L20 16Q30 54 2 47L-12 23Q-44 43-47 22L-24 4Q-60-10-42-35Z",
+  conomi:
+    "M-51-31Q-30-54-8-41L9-54 22-29 52-20 58 5 34 14 42 35 19 49-3 31-31 47-39 20-63 13-54-8Z",
+  organ: "M-42-16L-28-37-7-33 7-42 30-23 43-4 27 11 35 25 11 36-4 25-25 40-34 22-48 17-34 3Z",
+  gecko: "M-36-16Q-26-38-7-35L12-28 25-37 35-17 24-2 39 14 22 31 4 19-14 35-29 23-37 6-22-1Z",
+  wano: "M-50-21L-38-47-12-43 8-55 22-32 47-36 57-11 40 7 56 30 24 37 6 53-19 38-40 44-34 19-58 10Z",
+  alabasta:
+    "M-52-30Q-26-54 0-48L30-54 48-36 61-10 50 12 58 33 31 44 11 55-12 45-41 49-46 25-62 9-43-8Z",
+  drum: "M-35-27L-16-43 0-31 22-43 39-26 29-7 43 10 30 28 10 24-4 41-24 28-41 24-31 3-44-9Z",
 };
-
-function organicOutline(path: string, seed = 0): string {
-  const numbers = (path.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
-  const points: { x: number; y: number }[] = [];
-  for (let i = 0; i < numbers.length; i += 2)
-    points.push({
-      x: numbers[i] + (seed ? Math.sin(i * 1.7 + seed * 11) * 3 : 0),
-      y: numbers[i + 1] + (seed ? Math.cos(i * 1.3 + seed * 9) * 3 : 0),
-    });
-  if (points.length < 3) return path;
-  const format = (value: number) => Number(value.toFixed(2));
-  let result = `M${format(points[0].x)} ${format(points[0].y)}`;
-  for (let i = 0; i < points.length; i++) {
-    const previous = points[(i + points.length - 1) % points.length],
-      current = points[i],
-      next = points[(i + 1) % points.length],
-      following = points[(i + 2) % points.length];
-    result += `C${format(current.x + (next.x - previous.x) * 0.15)} ${format(current.y + (next.y - previous.y) * 0.15)} ${format(next.x - (following.x - current.x) * 0.15)} ${format(next.y - (following.y - current.y) * 0.15)} ${format(next.x)} ${format(next.y)}`;
+function inkCoast(path: string, fine = false) {
+  const tokens = path.match(/[MLHVQZ]|-?\d+(?:\.\d+)?/g) ?? [];
+  const points: [number, number][] = [];
+  let command = "M",
+    x = 0,
+    y = 0,
+    i = 0;
+  while (i < tokens.length) {
+    if (/[A-Z]/.test(tokens[i])) {
+      command = tokens[i++];
+      if (command === "Z") break;
+    }
+    if (command === "H") x = Number(tokens[i++]);
+    else if (command === "V") y = Number(tokens[i++]);
+    else if (command === "Q") {
+      i += 2;
+      x = Number(tokens[i++]);
+      y = Number(tokens[i++]);
+    } else {
+      x = Number(tokens[i++]);
+      y = Number(tokens[i++]);
+    }
+    points.push([x, y]);
   }
+  if (points.length < 3) return path;
+  const samples: [number, number][] = fine
+    ? points.flatMap((p, j) => {
+        const n = points[(j + 1) % points.length];
+        const dx = n[0] - p[0],
+          dy = n[1] - p[1],
+          len = Math.hypot(dx, dy);
+        const count = Math.max(1, Math.floor(len / 15));
+        return Array.from({ length: count }, (_, k): [number, number] => {
+          const t = k / count;
+          const ripple =
+            Math.sin(t * Math.PI) * Math.sin((j * 3 + k) * 2.7) * Math.min(3.2, len * 0.04);
+          return [
+            p[0] + dx * t - (dy / (len || 1)) * ripple,
+            p[1] + dy * t + (dx / (len || 1)) * ripple,
+          ];
+        });
+      })
+    : points;
+  let result = `M${samples[0][0]} ${samples[0][1]}`;
+  samples.forEach((p, j) => {
+    const before = samples[(j - 1 + samples.length) % samples.length],
+      next = samples[(j + 1) % samples.length],
+      after = samples[(j + 2) % samples.length];
+    result += `C${p[0] + (next[0] - before[0]) * 0.14} ${p[1] + (next[1] - before[1]) * 0.14} ${next[0] - (after[0] - p[0]) * 0.14} ${next[1] - (after[1] - p[1]) * 0.14} ${next[0]} ${next[1]}`;
+  });
   return result + "Z";
 }
-
-const shapes = [
-  "M-66-24 -49-47 -23-39 -8-54 16-42 35-46 48-20 70-7 53 15 58 34 25 40 10 55 -14 42 -36 46 -51 25 -72 12 -59-8Z",
-  "M-61-16 -52-40 -29-32 -14-50 8-39 20-46 47-33 43-8 65 7 41 21 33 42 3 31 -13 48 -29 26 -56 29 -49 8 -70-2Z",
-  "M-70-6 -56-35 -30-30 -19-45 7-32 22-40 47-27 61-8 50 14 72 26 42 30 19 48 -4 33 -30 41 -43 19 -62 18Z",
-  "M-59-28 -33-49 -13-25 6-36 29-23 49-32 60-7 42 4 56 24 29 43 5 33 -14 53 -34 35 -57 32 -46 9 -67 3Z",
-];
-
-const islands: Island[] = [
-  { x: 260, y: 205, size: 1.5, name: "Swallow Island" },
-  { x: 630, y: 220, size: 1.2, name: "Lvneel" },
-  { x: 395, y: 420, size: 1.35, name: "Flevance" },
-  { x: 850, y: 455, size: 1.1, name: "Spider Miles" },
-  { x: 205, y: 585, size: 0.75, name: "Rubeck Island" },
-  { x: 990, y: 290, size: 0.65, name: "Minion Island" },
-  { x: 1760, y: 305, size: 1.2, name: "Dawn Island", active: true },
-  { x: 2095, y: 270, size: 0.95, name: "Yotsuba Island", active: true },
-  { x: 2190, y: 505, size: 1.05, name: "Organ Islands", active: true },
-  { x: 1585, y: 435, size: 1.1, name: "Conomi Islands", active: true },
-  { x: 2030, y: 570, size: 0.65, name: "Gecko Islands" },
-  { x: 1460, y: 620, size: 0.55, name: "Loguetown" },
-  { x: 2225, y: 160, size: 0.8, name: "Shimotsuki Village" },
-  { x: 1520, y: 230, size: 0.7, name: "Goat Island" },
-  { x: 340, y: 1120, size: 1.2, name: "Ohara" },
-  { x: 850, y: 1100, size: 1.4, name: "Ilusia Kingdom" },
-  { x: 215, y: 1420, size: 1.2, name: "Kano Country" },
-  { x: 640, y: 1390, size: 1, name: "Toroa Island" },
-  { x: 970, y: 1300, size: 0.65, name: "Las Camp" },
-  { x: 1510, y: 1070, size: 0.9, name: "Baterilla" },
-  { x: 2090, y: 1170, size: 1.3, name: "Sorbet Kingdom" },
-  { x: 1810, y: 1380, size: 1.1, name: "Karate Island" },
-  { x: 2240, y: 1430, size: 0.75, name: "Briss Kingdom" },
-];
-const grandLine: Island[] = [
-  { x: 190, y: 815, size: 0.52, name: "Elbaf" },
-  { x: 385, y: 875, size: 0.75, name: "Whole Cake Island" },
-  { x: 605, y: 785, size: 0.65, name: "Wano Country" },
-  { x: 790, y: 890, size: 0.48, name: "Zou" },
-  { x: 980, y: 790, size: 0.6, name: "Dressrosa" },
-  { x: 1390, y: 860, size: 0.4, name: "Twin Cape" },
-  { x: 1505, y: 795, size: 0.35, name: "Whisky Peak" },
-  { x: 1635, y: 855, size: 0.4, name: "Little Garden" },
-  { x: 1770, y: 795, size: 0.48, name: "Drum Island" },
-  { x: 1900, y: 885, size: 0.62, name: "Alabasta" },
-  { x: 2045, y: 800, size: 0.4, name: "Water 7" },
-  { x: 2230, y: 875, size: 0.42, name: "Sabaody" },
-];
-
+const continentPaths = [northRed, southRed, leftRed, rightRed].map((d) => inkCoast(d, true));
+Object.keys(outlines).forEach((id) => {
+  outlines[id] = inkCoast(outlines[id]);
+});
+const defaultOutline = inkCoast(
+  "M-34-22Q-22-38-4-31L11-38 28-24 32-7 24 5 35 18 17 28 4 23-11 36-25 24-32 7-26-5-39-12Z",
+);
+const palette: Record<string, [string, string]> = {
+  forest: ["#a5bba0", "#cfceb0"],
+  desert: ["#dec399", "#eddbb5"],
+  snow: ["#d8e0d6", "#e9ead4"],
+  city: ["#b5bd9b", "#ddcfad"],
+  volcano: ["#b6a397", "#d9bea4"],
+  cake: ["#d8b9a3", "#e9d1b3"],
+  grove: ["#99b6a0", "#c7d0ac"],
+};
+export function AtlasEmblem({ type, size = 1 }: { type: string; size?: number }) {
+  return (
+    <g transform={`scale(${size})`} className="engraving">
+      {type === "windmill" ? (
+        <>
+          <path className="emblem-fill" d="M-12 14L-8-20H8L12 14Z" />
+          <path d="M-9-20L0-32 9-20M-17 15H18M-4 14V4H4V14" />
+          <g className="chart-windmill">
+            <path d="M0-16V-45H6V-24H-19V-18H28V-12H6V9H0V-16H-25V-22H0" />
+          </g>
+        </>
+      ) : type === "fort" ? (
+        <>
+          <path
+            className="emblem-fill"
+            d="M-24 17V-22H-18V-29H-10V-22H-3V-9H4V-22H11V-29H18V-22H24V17Z"
+          />
+          <path d="M-29 17H30M-5 17V3Q0-5 5 3V17M-16-12V-4M16-12V-4M0-27V-47L16-40 0-35" />
+        </>
+      ) : type === "pagoda" ? (
+        <>
+          <path
+            className="emblem-fill"
+            d="M-22 15H22V-5L32-8 16-18H-16L-32-8-22-5ZM-17-18V-30L-25-33-9-43H9L25-33 17-30V-18"
+          />
+          <path d="M-29 17H30M-9 15V-1H9V15M-14-25H14M-5-43V-53H5V-43" />
+        </>
+      ) : type === "cake" ? (
+        <>
+          <path className="emblem-fill" d="M-22 15V-3H22V15ZM-15-3V-19H15V-3ZM-7-19V-32H7V-19Z" />
+          <path d="M-27 15H27M-22 4Q-13 15-5 4Q4 15 12 4Q20 14 22 4M-2-32V-41L9-38-2-35" />
+        </>
+      ) : type === "desert" ? (
+        <>
+          <path d="M-31 14L-12-17 6 14M-12-17L-2 7M-2 14L16-11 34 14M17-14L22-5M-38 16H38" />
+          <path className="emblem-fill" d="M-6-6V-29H8V-6M-11-29L1-40 14-29Z" />
+        </>
+      ) : type === "city" ? (
+        <>
+          <path
+            className="emblem-fill"
+            d="M-23 15V-5L-14-14-5-5V15M-2 15V-23L8-34 18-23V15M19 15V-4L27-13 35-4V15"
+          />
+          <path d="M-28 17H39M4-15H12M4-7H12M4 1H12M-18 1H-10M24 2H30" />
+        </>
+      ) : type === "skull" ? (
+        <>
+          <path className="emblem-fill" d="M-21-2Q-30-33 0-35Q30-33 21-2L10 4V15H-10V4Z" />
+          <path d="M-14-15L-7-19-1-9-12-6ZM14-15L7-19 1-9 12-6ZM-4 0L0-6 4 0M-7 8V15M0 8V15M7 8V15M-31-32L-18-22M31-32L18-22" />
+        </>
+      ) : (
+        <>
+          <path d="M-28 15L-8-26 9 15M-8-26L-1-10 4-14M0 15L17-14 35 15M17-14L22-5 27-1M-33 17H38" />
+        </>
+      )}
+    </g>
+  );
+}
 function CompassRose({ x, y, size = 1 }: { x: number; y: number; size?: number }) {
   return (
-    <g transform={`translate(${x} ${y}) scale(${size})`} className="atlas-rose">
-      <circle r="64" />
-      <circle r="52" />
-      <path
-        d="M0-90 13-14 0 0 -13-14Z M90 0 14 13 0 0 14-13Z M0 90-13 14 0 0 13 14Z M-90 0-14-13 0 0-14 13Z"
-        className="rose-dark"
-      />
-      <path
-        d="M0-90 0 0 13-14Z M90 0 0 0 14 13Z M0 90 0 0-13 14Z M-90 0 0 0-14-13Z"
-        className="rose-light"
-      />
-      <path d="M-49-49 0-13 49-49 13 0 49 49 0 13-49 49-13 0Z" fill="none" />
-      <path d="M-95 0H95M0-95V95" />
-      <text y="-105" textAnchor="middle">
+    <g transform={`translate(${x} ${y}) scale(${size})`} className="chart-rose">
+      <circle r="71" />
+      <circle r="60" />
+      <circle r="46" />
+      {Array.from({ length: 16 }, (_, i) => (
+        <g key={i} transform={`rotate(${i * 22.5})`}>
+          <path
+            d={`M0 ${i % 2 ? -53 : -77}L8-12 0-3Z`}
+            className={i % 2 ? "rose-light" : "rose-dark"}
+          />
+          <path d={`M0 ${i % 2 ? -53 : -77}L-8-12 0-3Z`} className="rose-light" />
+        </g>
+      ))}
+      <circle r="5" />
+      <text y="-92" textAnchor="middle">
         N
       </text>
-      <text x="105" y="6" textAnchor="middle">
-        E
-      </text>
-      <text y="118" textAnchor="middle">
+      <text y="108" textAnchor="middle">
         S
       </text>
-      <text x="-107" y="6" textAnchor="middle">
+      <text x="95" y="8">
+        E
+      </text>
+      <text x="-109" y="8">
         W
       </text>
     </g>
   );
 }
-
-function EngravedShip({ x = 0, y = 0, scale = 1 }: { x?: number; y?: number; scale?: number }) {
+function Island({ place, level }: { place: AtlasPlace; level: number }) {
+  if (!place.point || !place.radius) return null;
+  if (
+    [
+      "dawn",
+      "yotsuba",
+      "conomi",
+      "organ",
+      "gecko",
+      "polestar",
+      "alabasta",
+      "wano",
+      "water-seven",
+    ].includes(place.id)
+  ) {
+    const span = place.radius * 3.2;
+    return (
+      <g
+        transform={`translate(${place.point.x} ${place.point.y})`}
+        className="painted-island"
+        data-island={place.id}
+      >
+        <image
+          href={`/world/atlas/${place.id}-vignette.webp`}
+          x={-span / 2}
+          y={-span / 2}
+          width={span}
+          height={span}
+          preserveAspectRatio="xMidYMid meet"
+        />
+      </g>
+    );
+  }
+  const [green, sand] = palette[place.terrain ?? "forest"];
+  const outline = outlines[place.id] ?? defaultOutline;
+  const ratio = place.radius / (outlines[place.id] ? 62 : 38);
+  const icon =
+    place.id === "dawn"
+      ? "windmill"
+      : place.id === "yotsuba"
+        ? "fort"
+        : place.id === "wano"
+          ? "pagoda"
+          : place.id === "onigashima"
+            ? "skull"
+            : place.terrain === "cake"
+              ? "cake"
+              : place.terrain === "city"
+                ? "city"
+                : place.terrain === "desert"
+                  ? "desert"
+                  : "mountain";
   return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`} className="engraved-ship">
-      <path d="M-45 24Q0 36 44 21L31 45Q-3 58-34 41Z" className="ship-hull" />
-      <path d="M-52 52Q-28 45-2 54T49 52M-57 63Q-31 55-4 64T53 62" fill="none" />
-      <path d="M-21 32V-47M9 36V-62M31 31V-35M-38 29 9-58 40 27" fill="none" />
-      <path
-        d="M-23-38Q-42-12-24 10L4 7Q-7-16-1-38Z M9-52Q-7-32 10-9L37-12Q21-33 28-52Z M10-6Q-5 15 12 32L36 25Q25 11 28-6Z"
-        className="ship-sails"
-      />
-      <path d="M9-64 29-58 9-52 M-21-49-8-45-21-40" className="ship-flag" />
-    </g>
-  );
-}
-
-function Landmark({
-  x,
-  y,
-  type,
-  scale = 1,
-}: {
-  x: number;
-  y: number;
-  type: "windmill" | "fortress" | "circus" | "gate" | "pagoda";
-  scale?: number;
-}) {
-  return (
-    <g transform={`translate(${x} ${y}) scale(${scale})`} className="atlas-landmark">
-      {type === "windmill" ? (
-        <>
-          <path d="M-17 16-12-33H12L18 16Z" className="landmark-paper" />
-          <path d="M-18-33 0-47 18-33Z" />
-          <path d="M-5 16V-1H5V16M-13 6H14M-12-7H13M-12-21H12" />
-          <g transform="translate(0 -35)">
-            <g className="atlas-windmill-rotor">
-              <path
-                d="M0 0-7-43 2-45 7-6 0 0 43-7 45 2 6 7 0 0 7 43-2 45-7 6 0 0-43 7-45-2-6-7Z"
-                className="landmark-paper"
-              />
-              <circle r="3" />
-            </g>
+    <g
+      transform={`translate(${place.point.x} ${place.point.y})`}
+      className={`chart-island terrain-${place.terrain}`}
+      data-island={place.id}
+    >
+      <g transform={`scale(${ratio})`}>
+        <path d={outline} className="island-shelf" />
+        <path d={outline} className="island-surf" />
+        <path d={outline} transform="translate(0 5)" fill="#4b655952" />
+        <path d={outline} fill={sand} className="island-shore" />
+        <path d={outline} transform="scale(.86)" fill={green} className="island-interior" />
+        <path d={outline} transform="scale(.67)" className="island-contour" />
+        <path d="M-19-27Q-3-8-15 9T1 35" className="island-river" />
+        {level >= 1 && (
+          <g className="island-vegetation">
+            {[-27, -13, 16, 30].map((x, i) => (
+              <g key={x} transform={`translate(${x} ${[-2, 18, 12, -10][i]})`}>
+                <path d="M0 0V-12M-6-7L0-20 7-7ZM-7-1L0-13 8-1Z" />
+                <path d="M-9 3H10" />
+              </g>
+            ))}
           </g>
-        </>
-      ) : null}
-      {type === "fortress" ? (
-        <>
-          <path
-            d="M-37 16V-29H-25V-36H-15V-29H-3V-43H9V-29H22V-36H34V16Z"
-            className="landmark-paper"
-          />
-          <path d="M-13 16V-10H8V16M-31-16V-8M25-16V-8M-3-42V-57L18-52-3-47" />
-          <path d="M-37 4H34M-34 11H-16M11 11H33" />
-        </>
-      ) : null}
-      {type === "circus" ? (
-        <>
-          <path d="M-40 16-30-8 0-42 30-8 40 16Z" className="landmark-paper" />
-          <path d="M0-42V-60L19-55 0-50M0-42-14 16M0-42 15 16M-30-8Q0 8 30-8M-8 16V0Q0-9 8 0V16" />
-        </>
-      ) : null}
-      {type === "gate" ? (
-        <>
-          <path d="M-36-27Q0-18 36-27M-40-35Q0-26 40-35M-22-29V18M22-29V18M-29-14H29M-32 18H-12M12 18H32" />
-        </>
-      ) : null}
-      {type === "pagoda" ? (
-        <>
-          <path d="M-30 20V0H30V20M-24-3V-20H24V-3M-17-23V-40H17V-23" className="landmark-paper" />
-          <path d="M-43-2Q0 10 43-2L25-11H-25ZM-35-24Q0-13 35-24L18-33H-18ZM-27-42Q0-31 27-42L0-56ZM0-56V-66M-6 20V7H6V20" />
-        </>
-      ) : null}
-      <path d="M-43 23Q-8 18 41 24M-31 28H30" className="landmark-ground" />
+        )}
+        {level >= 2 && (
+          <g className="island-houses">
+            <path d="M-32 16V9L-27 3-22 9V16ZM19-20V-28L25-34 31-28V-20ZM29 23V16L34 11 39 16V23Z" />
+            <path d="M-23 19Q0 0 25-22" className="island-road" />
+          </g>
+        )}
+      </g>
+      <g transform={`translate(3 ${place.id === "dawn" ? 5 : 0})`}>
+        <AtlasEmblem type={icon} size={Math.min(0.83, place.radius / 68)} />
+      </g>
     </g>
   );
 }
-
-export function AtlasChart({
-  motion = true,
-  regional = false,
+const archipelagoIslets: Record<string, [number, number, number][]> = {
+  conomi: [
+    [-80, -16, 13],
+    [-56, -62, 16],
+    [-15, -75, 10],
+    [50, -63, 17],
+    [77, -27, 11],
+    [67, 38, 14],
+    [-63, 64, 12],
+  ],
+  organ: [
+    [-55, -18, 12],
+    [-29, -51, 11],
+    [51, 23, 14],
+    [5, 55, 10],
+  ],
+  gecko: [
+    [-49, 23, 11],
+    [30, -48, 13],
+    [55, 6, 9],
+  ],
+  "long-ring": [
+    [-35, -8, 8],
+    [-22, -29, 7],
+    [0, -38, 8],
+    [27, -27, 7],
+    [39, 0, 8],
+    [29, 25, 7],
+    [0, 34, 8],
+    [-27, 23, 7],
+    [-39, 13, 6],
+  ],
+  "whole-cake": [
+    [-83, 15, 12],
+    [-60, 55, 10],
+    [-2, 71, 13],
+    [42, 62, 11],
+    [92, -12, 10],
+    [-33, -71, 11],
+  ],
+};
+export const AtlasChart = memo(function AtlasChart({
+  motion,
+  zoom,
+  showRoutes = true,
+  showShips = true,
+  sailing = false,
 }: {
-  motion?: boolean;
-  regional?: boolean;
+  motion: boolean;
+  zoom: number;
+  showRoutes?: boolean;
+  showShips?: boolean;
+  sailing?: boolean;
 }) {
+  const level = atlasDetailLevel(zoom);
+  const islands = atlasPlaces.filter(
+    (p) =>
+      p.point &&
+      p.radius &&
+      (p.detail <= level || p.detail < 2) &&
+      (showRoutes || p.placement !== "route"),
+  );
   return (
     <svg
-      className="atlas-chart"
+      className={`atlas-chart cartography-v2 ${motion ? "with-motion" : ""}`}
       viewBox="0 0 2400 1600"
-      aria-label="Морской атлас мира One Piece: четыре моря, Red Line, Grand Line и Calm Belt"
+      aria-label="Морской атлас: четыре моря, Red Line и Grand Line"
       role="img"
     >
       <defs>
-        <pattern id="atlas-coordinate-grid" width="120" height="100" patternUnits="userSpaceOnUse">
-          <path d="M120 0H0V100" fill="none" stroke="#735031" strokeWidth=".5" opacity=".14" />
-        </pattern>
-        <pattern id="atlas-wave-hatch" width="72" height="18" patternUnits="userSpaceOnUse">
+        <linearGradient id="atlas-ocean" x2=".6" y2="1">
+          <stop stopColor="#8eb3af" />
+          <stop offset=".43" stopColor="#bbcdc0" />
+          <stop offset="1" stopColor="#97b8b1" />
+        </linearGradient>
+        <linearGradient id="redland" x2="1" y2=".8">
+          <stop stopColor="#c6a78c" />
+          <stop offset=".5" stopColor="#b98d78" />
+          <stop offset="1" stopColor="#d4b99a" />
+        </linearGradient>
+        <pattern id="chart-waves" width="96" height="58" patternUnits="userSpaceOnUse">
           <path
-            d="M-8 9Q10 1 28 9T64 9T100 9"
+            d="M12 30q8-5 16 0t16 0M64 9q7-4 14 0"
             fill="none"
-            stroke="#876437"
-            strokeWidth="1.1"
-            opacity=".35"
+            stroke="#527c76"
+            strokeWidth=".8"
+            opacity=".3"
           />
         </pattern>
-        <pattern
-          id="atlas-calm-hatch"
-          width="22"
-          height="22"
-          patternUnits="userSpaceOnUse"
-          patternTransform="rotate(30)"
-        >
-          <path d="M0 0V22" fill="none" stroke="#5f7b72" strokeWidth=".8" opacity=".25" />
+        <pattern id="mountain-ridge" width="68" height="60" patternUnits="userSpaceOnUse">
+          <path
+            d="M2 47L22 13 39 47M22 13L26 30 34 33M28 52L48 22 67 52M48 22L51 39 61 41"
+            fill="none"
+            stroke="#805b48"
+            strokeWidth="1.1"
+            opacity=".45"
+          />
         </pattern>
+        <clipPath id="redland-clip">
+          {continentPaths.map((d, i) => (
+            <path key={i} d={d} />
+          ))}
+        </clipPath>
+        <radialGradient id="depth-wash">
+          <stop stopColor="#315f6625" />
+          <stop offset="1" stopColor="#315f6600" />
+        </radialGradient>
       </defs>
+      <rect width="2400" height="1600" fill="url(#atlas-ocean)" />
       <image
         href="/world/atlas-parchment.webp"
         width="2400"
         height="1600"
         preserveAspectRatio="none"
+        opacity=".2"
+        className="chart-paper-grain"
       />
-      <rect x="58" y="58" width="2284" height="1484" fill="#b87350" opacity=".22" />
-      <rect x="26" y="26" width="2348" height="1548" rx="5" className="atlas-neatline" />
-      <rect x="36" y="36" width="2328" height="1528" rx="3" className="atlas-inner-neatline" />
-      <g className="atlas-longitudes">
-        <path d="M1200 50V1550M70 800H2330M640 60V1540M1760 60V1540" />
-        <path d="M70 330H2330M70 1270H2330" />
-      </g>
-      <path
-        className="red-line-land"
-        d={organicOutline(
-          "M1050 50 1160 35 1320 50 1370 125 1280 190 1315 260 1270 335 1340 385 1285 455 1305 520 1250 585 1310 655 1275 702 1320 760 1290 820 1320 900 1260 952 1325 1030 1260 1110 1340 1170 1280 1250 1330 1335 1270 1410 1330 1510 1295 1560 1085 1560 1110 1460 1055 1390 1110 1310 1070 1240 1120 1165 1070 1090 1115 1010 1065 940 1110 875 1090 810 1135 750 1090 690 1125 630 1060 565 1115 495 1060 425 1120 355 1065 270 1120 195 1065 130Z",
-        )}
-      />
-      <g className="atlas-seas">
-        <path
-          d={organicOutline(
-            "M90 99 180 69 269 82 320 61 401 92 475 76 560 106 641 74 730 94 813 79 890 102 961 85 1040 119 1064 170 1036 218 1072 264 1042 309 1066 351 1027 395 1046 445 1013 489 1050 532 1015 572 1040 618 990 647 928 623 861 654 785 631 717 660 639 635 572 661 497 633 420 655 351 628 275 652 207 626 148 645 90 610 106 558 68 505 98 462 71 404 108 359 83 300 110 257 75 207 106 157Z",
-          )}
-        />
-        <path
-          d={organicOutline(
-            "M1390 113 1460 86 1528 107 1600 71 1680 91 1750 77 1820 97 1900 66 1980 97 2050 77 2130 94 2200 73 2280 101 2320 145 2292 192 2330 241 2302 281 2326 333 2289 379 2314 426 2285 475 2320 521 2290 566 2306 615 2240 643 2170 622 2090 649 2020 624 1945 654 1870 627 1795 652 1720 626 1648 650 1574 626 1498 651 1425 625 1381 590 1404 548 1368 502 1404 451 1380 406 1418 362 1380 310 1410 268 1370 219 1402 167Z",
-          )}
-        />
-        <path
-          d={organicOutline(
-            "M88 975 158 947 231 970 300 942 375 965 451 945 525 970 597 945 672 970 745 948 820 974 892 948 967 976 1041 954 1069 1003 1035 1049 1070 1095 1035 1139 1062 1188 1030 1232 1062 1278 1028 1324 1057 1367 1024 1410 1060 1457 1023 1502 964 1520 894 1499 820 1530 748 1510 674 1538 601 1510 528 1533 454 1508 380 1531 307 1503 234 1528 160 1503 91 1523 76 1474 108 1429 75 1381 108 1336 73 1289 107 1242 80 1195 110 1148 77 1102 109 1056 80 1013Z",
-          )}
-        />
-        <path
-          d={organicOutline(
-            "M1405 974 1480 949 1553 974 1628 951 1700 975 1773 947 1849 973 1921 949 1998 976 2071 950 2144 975 2218 950 2293 977 2320 1022 2288 1071 2320 1117 2285 1162 2314 1212 2282 1256 2320 1302 2285 1346 2312 1394 2280 1440 2315 1489 2280 1520 2204 1503 2130 1531 2055 1505 1982 1534 1909 1506 1835 1534 1760 1508 1688 1535 1614 1507 1540 1531 1466 1505 1394 1525 1374 1478 1405 1432 1374 1385 1404 1339 1370 1293 1402 1248 1373 1200 1406 1155 1375 1108 1407 1063 1376 1019Z",
-          )}
-        />
-      </g>
-      <rect x="65" y="55" width="2270" height="1490" fill="url(#atlas-coordinate-grid)" />
-      <g className="calm-belts">
-        <path d="M60 672Q550 654 1090 677L1110 719Q560 706 60 726Z M1300 677Q1850 655 2340 678V725Q1840 704 1290 720Z M60 925Q560 944 1095 920L1110 959Q560 980 60 967Z M1300 919Q1850 943 2340 923V965Q1840 979 1290 959Z" />
-        <path
-          d="M60 672H1090V721H60Z M1300 675H2340V724H1300Z M60 920H1095V967H60Z M1300 920H2340V966H1300Z"
-          fill="url(#atlas-calm-hatch)"
-        />
-      </g>
-      <path
-        className="grand-line-band"
-        d="M60 730Q570 711 1090 734L1148 790 1095 914Q560 941 60 917Z M1305 734Q1830 715 2340 733V916Q1835 940 1305 914L1250 802Z"
-      />
-      <path d="M60 739H1095V916H60Z M1305 739H2340V916H1305Z" fill="url(#atlas-wave-hatch)" />
-      <g className="atlas-current-lines">
-        {[0, 1, 2, 3].map((i) => (
-          <path
-            key={i}
-            d={`M90 ${754 + i * 43}Q400 ${730 + i * 43} 700 ${754 + i * 43}T1060 ${752 + i * 43}M1350 ${755 + i * 43}Q1650 ${729 + i * 43} 1910 ${754 + i * 43}T2320 ${755 + i * 43}`}
-          />
-        ))}
-      </g>
-      <g className="reverse-mountain">
-        <path d="M1200 699 1230 752 1290 790 1234 826 1200 894 1171 831 1110 789 1172 752Z" />
-        <path d="M1200 711V880M1122 789H1278" className="mountain-stream" />
-        <path d="M1157 782 1199 725 1242 782 1200 849Z" className="mountain-peaks" />
-        <text x="1200" y="922" textAnchor="middle">
-          Reverse Mountain
-        </text>
-      </g>
-      <g className="atlas-islands">
-        {islands.map((island, index) => (
-          <g key={island.name} transform={`translate(${island.x} ${island.y})`}>
-            <path
-              d={organicOutline(shapes[index % shapes.length], index + 1)}
-              transform={`scale(${island.size})`}
-              className={island.active ? "atlas-island active-island" : "atlas-island"}
-            />
-            <path
-              d={organicOutline(shapes[(index + 1) % shapes.length], index + 1)}
-              transform={`scale(${island.size * 0.59})`}
-              className="island-contour"
-            />
-            {!regional || !island.active ? (
-              <text y={island.size * 57 + 20} textAnchor="middle">
-                {island.name}
-              </text>
-            ) : null}
-            <path d={`M${-island.size * 25} 5l13-19 14 19 10-11 12 15`} className="island-hills" />
+      <rect x="40" y="38" width="2320" height="1521" fill="url(#chart-waves)" />
+      <ellipse cx="1750" cy="350" rx="400" ry="260" fill="url(#depth-wash)" />
+      <ellipse cx="600" cy="1200" rx="400" ry="200" fill="url(#depth-wash)" />
+      <g className="chart-rhumbs">
+        {[350, 1150, 2050].map((x, i) => (
+          <g key={x}>
+            {Array.from({ length: 16 }, (_, n) => {
+              const angle = (n * Math.PI) / 8;
+              return (
+                <path
+                  key={n}
+                  d={`M${x} ${[390, 1260, 1180][i]}l${Math.cos(angle) * 2500} ${Math.sin(angle) * 2500}`}
+                />
+              );
+            })}
           </g>
         ))}
       </g>
-      <g className="grand-line-islands">
-        {grandLine.map((island, index) => (
-          <g key={island.name} transform={`translate(${island.x} ${island.y})`}>
-            <path
-              d={organicOutline(shapes[(index + 2) % shapes.length], index + 2)}
-              transform={`scale(${island.size})`}
-              className="atlas-island"
-            />
-            <text y={island.size * 54 + 16} textAnchor="middle">
-              {island.name}
-            </text>
+      <g className="chart-graticule">
+        {Array.from({ length: 11 }, (_, i) => (
+          <path key={i} d={`M${200 + i * 200} 38V1559`} />
+        ))}
+        {Array.from({ length: 7 }, (_, i) => (
+          <path key={i} d={`M40 ${200 + i * 200}H2360`} />
+        ))}
+      </g>
+      <path d="M40 710H2360V760H40ZM40 934H2360V992H40Z" className="chart-calm" />
+      <path d="M40 760H2360V934H40Z" className="chart-grand" />
+      <g className="chart-ocean-flow">
+        <path d="M280 865Q480 925 700 859T1120 858M1330 878Q1530 939 1750 863T2260 873" />
+        <path d="M1440 595Q1660 640 1790 601M370 1190Q550 1160 650 1205M390 554Q530 606 700 565" />
+      </g>
+      <g className="red-continent">
+        {continentPaths.map((d, i) => (
+          <g key={i}>
+            <path d={d} className="continent-shelf" />
+            <path d={d} className="continent-cliff-shadow" transform="translate(0 9)" />
+            <path d={d} fill="url(#redland)" className="continent-coast" />
           </g>
         ))}
       </g>
-      <g className="atlas-region-names">
-        <text x="610" y="575" textAnchor="middle">
+      <g clipPath="url(#redland-clip)">
+        <rect width="2400" height="1600" fill="url(#mountain-ridge)" />
+        <path
+          d="M1220 80Q1160 250 1230 410T1220 800M1220 858Q1290 1040 1270 1200T1230 1510"
+          className="continent-spine"
+        />
+      </g>
+      <g className="reverse-pass">
+        <path d="M1160 776L1220 746 1272 780 1251 832 1222 858 1172 821Z" />
+        <path
+          d="M1132 733L1220 799 1276 729M1118 905L1220 799 1290 915M1220 799H1326"
+          className="reverse-stream"
+        />
+        <path d="M1212 768L1220 748 1230 772M1178 803L1188 783 1200 809" />
+      </g>
+      <g className="chart-sea-titles">
+        <text x="525" y="220">
           North Blue
         </text>
-        <text x="1840" y="155" textAnchor="middle">
+        <text x="1800" y="158">
           East Blue
         </text>
-        <text x="605" y="1218" textAnchor="middle">
+        <text x="540" y="1120">
           West Blue
         </text>
-        <text x="1830" y="1115" textAnchor="middle">
+        <text x="1830" y="1240">
           South Blue
         </text>
-        <text x="1200" y="112" textAnchor="middle" className="red-line-title">
-          RED LINE
-        </text>
-        <text
-          x="1190"
-          y="1390"
-          textAnchor="middle"
-          transform="rotate(-90 1190 1390)"
-          className="red-line-title lower"
-        >
-          RED LINE
-        </text>
       </g>
-      <g className="atlas-band-labels">
-        <text x="535" y="725" textAnchor="middle">
-          GRAND LINE · NEW WORLD
+      <g className="chart-band-titles">
+        <text x="665" y="964">
+          CALM BELT
         </text>
-        <text x="1830" y="727" textAnchor="middle">
+        <text x="1700" y="741">
+          CALM BELT
+        </text>
+        <text x="615" y="785">
+          NEW WORLD
+        </text>
+        <text x="1710" y="775">
           GRAND LINE · PARADISE
         </text>
-        <text x="720" y="694">
-          Calm Belt
+        <text x="1220" y="248" transform="rotate(-82 1220 248)" className="chart-red-title">
+          RED LINE
         </text>
-        <text x="1640" y="945">
-          Calm Belt
-        </text>
-      </g>
-      <CompassRose x={780} y={1440} size={0.78} />
-      <CompassRose x={2210} y={1030} size={0.43} />
-      <g className="atlas-cartouche">
-        <path d="M75 68H625L644 101 625 134H75L60 101Z" />
-        <text x="351" y="98" textAnchor="middle">
-          GRAND LINE ATLAS
-        </text>
-        <text x="351" y="119" textAnchor="middle" className="cartouche-sub">
-          CHART OF THE FOUR SEAS
+        <text x="1300" y="1310" transform="rotate(-82 1300 1310)" className="chart-red-title">
+          RED LINE
         </text>
       </g>
-      <g className="atlas-scale-bar" transform="translate(1610 1510)">
-        <path d="M0 0H340M0-7V7M85-5V5M170-7V7M255-5V5M340-7V7" />
-        <text y="-16">SEA CHART · VOLUME I</text>
-        <text x="0" y="24">
-          0
-        </text>
-        <text x="170" y="24" textAnchor="middle">
-          I
-        </text>
-        <text x="340" y="24" textAnchor="end">
-          II
-        </text>
+      <g className="chart-islands">
+        {islands
+          .filter((p) => p.kind !== "underwater" && p.kind !== "sky")
+          .map((p) => (
+            <Island key={p.id} place={p} level={level} />
+          ))}
       </g>
-      <EngravedShip x={270} y={1100} scale={0.62} />
-      <EngravedShip x={1570} y={1330} scale={0.55} />
-      <EngravedShip x={1870} y={505} scale={0.7} />
-      <Landmark x={1760} y={287} type="windmill" scale={0.62} />
-      <Landmark x={2095} y={255} type="fortress" scale={0.55} />
-      <Landmark x={2190} y={482} type="circus" scale={0.52} />
-      <Landmark x={1585} y={416} type="gate" scale={0.57} />
-      <Landmark x={605} y={774} type="pagoda" scale={0.6} />
-      {!regional && (
-        <text x="1870" y="559" textAnchor="middle" className="atlas-small-label">
-          Baratie
-        </text>
+      {level >= 1 && (
+        <g className="chart-islets">
+          {Object.entries(archipelagoIslets)
+            .filter(([id]) => islands.some((p) => p.id === id))
+            .flatMap(([id, parts]) => {
+              const place = atlasPlaces.find((p) => p.id === id)!;
+              return parts.map(([dx, dy, r], i) => (
+                <g
+                  key={`${id}-${i}`}
+                  transform={`translate(${place.point!.x + dx} ${place.point!.y + dy}) scale(${r / 38})`}
+                >
+                  <path d={defaultOutline} className="island-shelf" />
+                  <path d={defaultOutline} fill="#cbd0a9" className="island-shore" />
+                  <path d={defaultOutline} transform="scale(.7)" fill="#a7bc9d" />
+                </g>
+              ));
+            })}
+        </g>
       )}
-      <g className="atlas-roaming-ship" transform={!motion ? "translate(250 505)" : undefined}>
-        {motion && (
-          <animateMotion
-            dur="62s"
-            repeatCount="indefinite"
-            path="M250 505Q500 480 790 580T1020 420Q830 460 570 490T250 505"
-          />
-        )}
-        <EngravedShip scale={0.5} />
+      {level >= 2 && (
+        <>
+          <g transform="translate(2010 692)" className="chart-sky">
+            <path d="M-48 22Q-61 0-41-5Q-48-33-20-33Q-10-56 12-35Q37-45 40-19Q64-12 48 13Q40 32 16 23Q-14 39-32 23Z" />
+            <AtlasEmblem type="pagoda" size={0.65} />
+            <path d="M0 42V113" className="sky-tether" />
+          </g>
+          <g transform="translate(2357 919)" className="chart-underwater">
+            <circle r="34" />
+            <circle r="40" />
+            <AtlasEmblem type="city" size={0.65} />
+            <path d="M0-45V-126" className="sky-tether" />
+          </g>
+          <path d="M455 771L467 751" className="chart-bridge" />
+          <path d="M2180 800Q2210 762 2250 783" className="chart-rail" />
+        </>
+      )}
+      <g transform="translate(1670 525)">
+        <image
+          href="/world/atlas/baratie-vignette.webp"
+          x="-66"
+          y="-44"
+          width="132"
+          height="88"
+          preserveAspectRatio="xMidYMid meet"
+        />
       </g>
-      <g
-        className="atlas-roaming-ship second"
-        transform={!motion ? "translate(1440 1140)" : undefined}
-      >
-        {motion && (
-          <animateMotion
-            dur="78s"
-            repeatCount="indefinite"
-            path="M1440 1140Q1640 1020 1940 1040T2250 1310Q2100 1430 1790 1250T1440 1140"
-          />
-        )}
-        <EngravedShip scale={0.45} />
+      <g transform="translate(2370 777)">
+        <AtlasEmblem type="city" size={0.8} />
       </g>
-      <g className="atlas-whirlpools">
-        <path d="M920 1305c70-10 72 55 20 58-42 3-40-39-9-39 26 0 22 22 5 20M1935 385c60-9 63 47 17 51-37 3-36-34-7-35 22 0 19 19 4 18" />
+      <g className="sea-monster engraving" transform="translate(460 510)">
+        <path className="emblem-fill" d="M-65 9Q-46-29-26-3Q-5-37 15-9Q35-31 54 8L73 21H-70Z" />
+        <path d="M-79 24q16-9 33 0t33 0t33 0t33 0t33 0M-64 2Q-75-18-61-29L-53-14M-39-5L-31-15M7-9L15-21M47-1L55-12" />
       </g>
+      <g className="chart-whale engraving" transform="translate(1720 1300)">
+        <path
+          className="emblem-fill"
+          d="M-63 15Q-66-42-13-39Q33-34 40 10L65-4 83-31 87-3 103 5 69 20Q22 40-20 35Z"
+        />
+        <circle cx="-42" cy="-9" r="3" />
+        <path
+          d="M-63 11Q-40 22-22 13M-33-42Q-37-63-49-64M-33-42Q-27-67-15-62M-76 43q15-8 30 0t30 0t30 0t30 0t30 0"
+          className="whale-breath"
+        />
+      </g>
+      <AtlasFleet
+        motion={motion}
+        enabled={showShips}
+        sailing={sailing}
+        scale={0.65 * Math.min(1, 4 / zoom)}
+      />
+      <CompassRose x={590} y={1375} size={1.05} />
+      <CompassRose x={1930} y={1130} size={0.5} />
+      <CompassRose x={520} y={350} size={0.52} />
+      <g className="chart-cartouche" transform="translate(475 80)">
+        <path d="M-325 0H325L343 28 325 57H-325L-343 28Z" />
+        <path d="M-310 7H310M-310 49H310" />
+        <text y="27">THE GRAND LINE ATLAS</text>
+        <text y="44" className="chart-cartouche-sub">
+          A CHART OF SEAS, ISLANDS & UNWRITTEN STORIES
+        </text>
+      </g>
+      <g className="chart-unknown-note">
+        <text x="480" y="656">
+          INCOMPLETELY CHARTED WATERS
+        </text>
+        <text x="495" y="1250">
+          Beyond the known shores
+        </text>
+        <text x="1780" y="1460">
+          Every voyage begins with a dream.
+        </text>
+      </g>
+      <rect x="25" y="25" width="2350" height="1550" className="chart-border-outer" />
+      <rect x="40" y="38" width="2320" height="1521" className="chart-border-inner" />
+      {Array.from({ length: 24 }, (_, i) => (
+        <g key={i} className="chart-border-ticks">
+          <path d={`M${i * 100 + 50} 25V38M${i * 100 + 50} 1559V1575`} />
+          <text x={i * 100 + 50} y="20" textAnchor="middle">
+            {String.fromCharCode(65 + i)}
+          </text>
+        </g>
+      ))}
     </svg>
   );
-}
+});

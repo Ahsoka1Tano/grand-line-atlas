@@ -1,7 +1,7 @@
 export const WORLD_WIDTH = 2400;
 export const WORLD_HEIGHT = 1600;
 
-export const EAST_BLUE_BOUNDS = { x: 1430, y: 120, width: 900, height: 550 };
+export const EAST_BLUE_BOUNDS = { x: 1360, y: 100, width: 940, height: 620 };
 
 export type WorldLocation = {
   id: string;
@@ -29,9 +29,9 @@ export const worldLocations: WorldLocation[] = [
     kind: "village",
     subtitle: "Там, где рождается мечта",
     image: "/world/foosha.webp",
-    x: 1760,
-    y: 305,
-    port: { x: 1780, y: 355 },
+    x: 2190,
+    y: 385,
+    port: { x: 2190, y: 416 },
     accent: "#b9d594",
     description:
       "Тихая гавань, ветряная мельница и океан до самого горизонта. Даже самое большое путешествие начинается с небольшого причала.",
@@ -63,9 +63,9 @@ export const worldLocations: WorldLocation[] = [
     kind: "navy",
     subtitle: "За стенами морской базы",
     image: "/world/shells-town.webp",
-    x: 2095,
-    y: 270,
-    port: { x: 2065, y: 315 },
+    x: 1975,
+    y: 175,
+    port: { x: 1950, y: 200 },
     accent: "#8ab6d4",
     description:
       "Белые башни Дозора возвышаются над портовым городом. Под безупречным порядком скрываются истории тех, кто выбрал собственный путь.",
@@ -97,9 +97,9 @@ export const worldLocations: WorldLocation[] = [
     kind: "town",
     subtitle: "Город с характером",
     image: "/world/orange-town.webp",
-    x: 2190,
-    y: 505,
-    port: { x: 2205, y: 555 },
+    x: 1940,
+    y: 432,
+    port: { x: 1982, y: 472 },
     accent: "#e7a478",
     description:
       "Черепичные крыши, узкие улочки и яркий шатёр на фоне моря. За весёлой декорацией здесь всегда чувствуется пиратская авантюра.",
@@ -131,9 +131,9 @@ export const worldLocations: WorldLocation[] = [
     kind: "restaurant",
     subtitle: "Лучший стол посреди океана",
     image: "/world/baratie.webp",
-    x: 1870,
-    y: 505,
-    port: { x: 1850, y: 550 },
+    x: 1670,
+    y: 525,
+    port: { x: 1670, y: 565 },
     accent: "#dfc28f",
     description:
       "Плавучий ресторан с зелёной крышей и рыбой на носу. Здесь даже среди открытого моря можно найти тёплый свет, горячий ужин и новую встречу.",
@@ -165,9 +165,9 @@ export const worldLocations: WorldLocation[] = [
     kind: "stronghold",
     subtitle: "За спокойствием — буря",
     image: "/world/arlong-park.webp",
-    x: 1585,
-    y: 435,
-    port: { x: 1580, y: 488 },
+    x: 1670,
+    y: 300,
+    port: { x: 1725, y: 310 },
     accent: "#88c2b4",
     description:
       "Высокие стены, тропические сады и дворец у самой воды. Этот берег красив, но его тишина совсем не похожа на тишину родной гавани.",
@@ -194,12 +194,12 @@ export const worldLocations: WorldLocation[] = [
 ];
 
 export const worldConnections = [
-  { from: "foosha", to: "shells-town", curveX: -100, curveY: -20 },
-  { from: "shells-town", to: "orange-town", curveX: 50, curveY: -80 },
-  { from: "orange-town", to: "baratie", curveX: 120, curveY: 0 },
-  { from: "baratie", to: "arlong-park", curveX: 140, curveY: 10 },
-  { from: "orange-town", to: "arlong-park", curveX: 20, curveY: -60 },
-  { from: "foosha", to: "baratie", curveX: 0, curveY: 55 },
+  { from: "foosha", to: "shells-town", curveX: 75, curveY: 10 },
+  { from: "shells-town", to: "orange-town", curveX: 60, curveY: 25 },
+  { from: "orange-town", to: "baratie", curveX: 0, curveY: 85 },
+  { from: "baratie", to: "arlong-park", curveX: -35, curveY: 0 },
+  { from: "orange-town", to: "arlong-park", curveX: 0, curveY: 40 },
+  { from: "foosha", to: "baratie", curveX: 0, curveY: 160 },
 ];
 
 export const locationById = (id: string) => worldLocations.find((location) => location.id === id);

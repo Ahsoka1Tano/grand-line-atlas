@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start --hostname 127.0.0.1",
     "typecheck": "tsc --noEmit",
-    "test": "node --conditions=react-server --import tsx --test tests/game-service.test.ts",
+    "test": "node --conditions=react-server --import tsx --test tests/game-service.test.ts tests/atlas.test.ts",
     "test:http": "node --test tests/http-game.test.mjs"
   },
   "dependencies": {

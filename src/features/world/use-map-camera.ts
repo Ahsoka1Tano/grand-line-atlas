@@ -16,6 +16,7 @@ import {
   focusCamera,
   initialCamera,
   zoomCamera,
+  resizeCamera,
   type Viewport,
 } from "./navigation";
 
@@ -32,6 +33,7 @@ export function useMapCamera(ref: RefObject<HTMLDivElement | null>) {
   const [camera, setCamera] = useState(initialCamera);
   const [dragging, setDragging] = useState(false);
   const [measured, setMeasured] = useState(false);
+  const viewportRef = useRef<Viewport>({ width: 1000, height: 630 });
   const pointers = useRef(new Map<number, Point>());
 
   useLayoutEffect(() => {
@@ -40,6 +42,7 @@ export function useMapCamera(ref: RefObject<HTMLDivElement | null>) {
     const bounds = element.getBoundingClientRect();
     if (bounds.width && bounds.height) {
       const size = { width: bounds.width, height: bounds.height };
+      viewportRef.current = size;
       setViewport(size);
       setCamera((current) => clampCamera(current, size));
       setMeasured(true);
@@ -47,8 +50,10 @@ export function useMapCamera(ref: RefObject<HTMLDivElement | null>) {
     const observer = new ResizeObserver(([entry]) => {
       const next = { width: entry.contentRect.width, height: entry.contentRect.height };
       if (!next.width || !next.height) return;
+      const previous = viewportRef.current;
+      viewportRef.current = next;
       setViewport(next);
-      setCamera((current) => clampCamera(current, next));
+      setCamera((current) => resizeCamera(current, previous, next));
     });
     observer.observe(element);
     return () => observer.disconnect();
@@ -164,6 +169,7 @@ export function useMapCamera(ref: RefObject<HTMLDivElement | null>) {
   };
 
   return {
+    viewport,
     camera,
     measured,
     scale: fitScale(viewport) * camera.zoom,
