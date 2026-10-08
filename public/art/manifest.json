@@ -1,8 +1,8 @@
 {
-  "version": 1,
+  "version": 2,
   "era": "East Blue",
   "generator": "built-in image_gen",
-  "createdAt": "2026-10-07",
+  "createdAt": "2026-10-08",
   "reviewStatus": "integrated-awaiting-owner-art-direction-review",
   "assets": [
     {
@@ -28,6 +28,28 @@
       "width": 900,
       "height": 1350,
       "crop": "50% 28%"
+    },
+    {
+      "characterId": "usopp",
+      "image": "/art/usopp.webp",
+      "source": "assets/source-art/usopp.png",
+      "width": 900,
+      "height": 1350,
+      "crop": "50% 28%"
+    },
+    {
+      "characterId": "sanji",
+      "image": "/art/sanji.webp",
+      "source": "assets/source-art/sanji.png",
+      "width": 900,
+      "height": 1350,
+      "crop": "50% 28%"
     }
-  ]
+  ],
+  "crewScene": {
+    "image": "/art/crew-voyage.webp",
+    "source": "assets/source-art/crew-voyage.png",
+    "width": 1600,
+    "height": 800
+  }
 }

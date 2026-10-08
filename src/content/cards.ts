@@ -56,19 +56,48 @@ const characters = {
       "Она читает ветер, видит путь сквозь шторм и знает цену настоящему сокровищу. С ней даже неизвестный океан становится ближе.",
     accent: "#efa85c",
   },
+  usopp: {
+    characterId: "usopp",
+    name: "Усопп",
+    latinName: "USOPP",
+    epithet: "Храбрый воин моря",
+    role: "Стрелок",
+    image: "/art/usopp.webp",
+    quote: "Моя мечта — стать храбрым воином моря.",
+    ability: "Звезда пороха",
+    description:
+      "Меткий выстрел, невероятная история и храбрость, которая появляется именно тогда, когда нужна друзьям. Его фантазия способна изменить любое приключение.",
+    accent: "#cfaa70",
+  },
+  sanji: {
+    characterId: "sanji",
+    name: "Санджи",
+    latinName: "SANJI",
+    epithet: "Чёрная нога",
+    role: "Кок",
+    image: "/art/sanji.webp",
+    quote: "Когда-нибудь я найду All Blue.",
+    ability: "Concassé",
+    description:
+      "Элегантность, стремительный удар и уважение к каждому, кто голоден. Кок, с которым команда всегда готова идти навстречу следующему морю.",
+    accent: "#8ab3d1",
+  },
 };
 
-export const initialCards: CharacterCard[] = [
+export const cardCatalog: CharacterCard[] = [
   { ...characters.luffy, id: "eb-001-ssr", rarity: "SSR", number: "001" },
   { ...characters.zoro, id: "eb-002-sr", rarity: "SR", number: "002" },
   { ...characters.nami, id: "eb-003-r", rarity: "R", number: "003" },
   { ...characters.luffy, id: "eb-004-c", rarity: "C", number: "004" },
   { ...characters.zoro, id: "eb-005-r", rarity: "R", number: "005" },
   { ...characters.nami, id: "eb-006-sr", rarity: "SR", number: "006" },
+  { ...characters.zoro, id: "eb-007-c", rarity: "C", number: "007" },
+  { ...characters.nami, id: "eb-008-c", rarity: "C", number: "008" },
+  { ...characters.usopp, id: "eb-009-c", rarity: "C", number: "009" },
+  { ...characters.sanji, id: "eb-010-c", rarity: "C", number: "010" },
+  { ...characters.usopp, id: "eb-011-r", rarity: "R", number: "011" },
+  { ...characters.sanji, id: "eb-012-sr", rarity: "SR", number: "012" },
 ];
-
-// Stage A uses a fixed presentation; this is not a random drop table.
-export const demoBoxCards: CharacterCard[] = [initialCards[2], initialCards[1], initialCards[0]];
 
 export const rarityLabels: Record<Rarity, string> = {
   C: "Обычная",

@@ -1,7 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import { Heart, Sparkles, Swords, Compass, Crown } from "lucide-react";
+import {
+  Heart,
+  Sparkles,
+  Swords,
+  Compass,
+  Crown,
+  Target,
+  Utensils,
+  LockKeyhole,
+} from "lucide-react";
 import { useRef, type CSSProperties } from "react";
 import { type CharacterCard, rarityLabels } from "@/content/cards";
 
@@ -12,6 +21,7 @@ type Props = {
   onInspect?: () => void;
   onFavorite?: () => void;
   decorative?: boolean;
+  locked?: boolean;
 };
 
 export function CharacterCardView({
@@ -21,10 +31,13 @@ export function CharacterCardView({
   onInspect,
   onFavorite,
   decorative = false,
+  locked = false,
 }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   const RoleIcon =
-    card.characterId === "luffy" ? Crown : card.characterId === "zoro" ? Swords : Compass;
+    { luffy: Crown, zoro: Swords, nami: Compass, usopp: Target, sanji: Utensils }[
+      card.characterId
+    ] ?? Compass;
   const updateTilt = (event: React.PointerEvent<HTMLDivElement>) => {
     if (
       event.pointerType !== "mouse" ||
@@ -46,7 +59,7 @@ export function CharacterCardView({
   return (
     <div
       ref={ref}
-      className={`character-card rarity-${card.rarity.toLowerCase()} ${decorative ? "decorative" : ""}`}
+      className={`character-card rarity-${card.rarity.toLowerCase()} ${decorative ? "decorative" : ""} ${locked ? "is-unowned" : ""}`}
       style={{ "--character-accent": card.accent } as CSSProperties}
       onPointerMove={updateTilt}
       onPointerLeave={resetTilt}
@@ -65,6 +78,12 @@ export function CharacterCardView({
       <div className="card-shade" />
       <div className="card-foil" />
       <div className="card-border" />
+      {locked && (
+        <span className="card-unowned-label">
+          <LockKeyhole size={10} />
+          Не найдена
+        </span>
+      )}
       <div className="card-top">
         <span className="card-set">
           EAST BLUE <span>·</span> 01

@@ -1,0 +1,22 @@
+export const GAME_SCHEMA_VERSION = "001-game-core";
+export const GAME_SCHEMA_SQL = `
+CREATE TABLE gla_profiles (id uuid PRIMARY KEY, name varchar(24) NOT NULL, crew_revision integer NOT NULL DEFAULT 0 CHECK(crew_revision >= 0), created_at timestamptz NOT NULL DEFAULT now());
+CREATE TABLE gla_wallets (profile_id uuid PRIMARY KEY REFERENCES gla_profiles(id), berries integer NOT NULL CHECK(berries >= 0), free_boxes integer NOT NULL CHECK(free_boxes >= 0));
+CREATE TABLE gla_editions (id text PRIMARY KEY, character_id text NOT NULL, payload jsonb NOT NULL, UNIQUE(id, character_id));
+CREATE TABLE gla_openings (id uuid PRIMARY KEY, profile_id uuid NOT NULL REFERENCES gla_profiles(id), request_key uuid NOT NULL, cost integer NOT NULL CHECK(cost >= 0), edition_ids jsonb NOT NULL, instance_ids jsonb NOT NULL, pool_version text NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), UNIQUE(profile_id,request_key), UNIQUE(profile_id,id));
+CREATE TABLE gla_instances (id uuid PRIMARY KEY, profile_id uuid NOT NULL REFERENCES gla_profiles(id), edition_id text NOT NULL REFERENCES gla_editions(id), character_id text NOT NULL, bound boolean NOT NULL DEFAULT false, opening_id uuid REFERENCES gla_openings(id), acquired_at timestamptz NOT NULL DEFAULT now(), UNIQUE(profile_id,id,character_id), FOREIGN KEY(edition_id,character_id) REFERENCES gla_editions(id,character_id), FOREIGN KEY(profile_id,opening_id) REFERENCES gla_openings(profile_id,id));
+CREATE TABLE gla_crew (profile_id uuid NOT NULL REFERENCES gla_profiles(id), position integer NOT NULL CHECK(position BETWEEN 0 AND 4), instance_id uuid NOT NULL REFERENCES gla_instances(id), character_id text NOT NULL, battle boolean NOT NULL, PRIMARY KEY(profile_id,position), UNIQUE(profile_id,character_id), UNIQUE(instance_id), FOREIGN KEY(profile_id,instance_id,character_id) REFERENCES gla_instances(profile_id,id,character_id));
+CREATE TABLE gla_favorites (profile_id uuid NOT NULL REFERENCES gla_profiles(id), edition_id text NOT NULL REFERENCES gla_editions(id), PRIMARY KEY(profile_id,edition_id));
+CREATE TABLE gla_wallet_entries (id uuid PRIMARY KEY, profile_id uuid NOT NULL REFERENCES gla_profiles(id), delta integer NOT NULL, source_key text NOT NULL, created_at timestamptz NOT NULL DEFAULT now(), UNIQUE(profile_id,source_key));
+CREATE TABLE gla_sessions (token_hash text PRIMARY KEY, profile_id uuid NOT NULL REFERENCES gla_profiles(id), expires_at timestamptz NOT NULL);
+CREATE INDEX gla_instances_owner ON gla_instances(profile_id);
+CREATE INDEX gla_openings_owner_date ON gla_openings(profile_id,created_at DESC);
+ALTER TABLE gla_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gla_wallets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gla_instances ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gla_openings ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gla_crew ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gla_favorites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gla_wallet_entries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE gla_sessions ENABLE ROW LEVEL SECURITY;
+`;

@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { GameProvider } from "@/features/game/game-provider";
 
 export const metadata: Metadata = {
   title: "Grand Line Atlas — твоя команда, твоя легенда",
   description:
-    "Фанатский мир One Piece. Собери команду мечты и начни собственное путешествие. Визуальный прототип коллекции и открытия боксов.",
+    "Фанатский мир One Piece. Открывай боксы, собирай коллекцию персонажей и команду мечты, исследуй морской атлас.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ru">
-      <body>{children}</body>
+      <body>
+        <GameProvider>{children}</GameProvider>
+      </body>
     </html>
   );
 }
