@@ -45,6 +45,7 @@ import { useMapCamera } from "./use-map-camera";
 import { LocationScene } from "./location-scene";
 import { AtlasChart } from "./atlas-chart";
 import { MerryShip } from "./atlas-fleet";
+import { expandedAtlasLabels, atlasLabelTop } from "./atlas-labels";
 import "./world.css";
 import "./atlas.css";
 
@@ -52,6 +53,7 @@ const placementLabels = {
   chart: "По опубликованной карте",
   route: "Положение по маршруту",
   local: "Внутри острова · условная точка",
+  reference: "По фанатской карте OP Maps",
   unknown: "Положение неизвестно",
   moving: "Движущееся место",
 };
@@ -73,6 +75,7 @@ export function WorldExperience() {
   const [showRoutes, setShowRoutes] = useState(true);
   const [showNames, setShowNames] = useState(true);
   const [showShips, setShowShips] = useState(true);
+  const [showReference, setShowReference] = useState(true);
   const [layersOpen, setLayersOpen] = useState(false);
   const [sourcesOpen, setSourcesOpen] = useState(false);
   const [journalOpen, setJournalOpen] = useState(false);
@@ -106,10 +109,11 @@ export function WorldExperience() {
       )
     : undefined;
   const source = atlasSources.find((s) => s.id === selected?.source);
+  const relatedPlaces = selected ? atlasPlaces.filter((p) => p.parent === selected.id) : [];
   const results = useMemo(() => searchAtlas(query, region), [query, region]);
   const visible = useMemo(
-    () => visibleAtlasPlaces(camera.camera.zoom, showRoutes),
-    [camera.camera.zoom, showRoutes],
+    () => visibleAtlasPlaces(camera.camera.zoom, showRoutes, showReference),
+    [camera.camera.zoom, showRoutes, showReference],
   );
   const level = atlasDetailLevel(camera.camera.zoom);
   const regionInfo = atlasRegions.find((r) => r.id === region)!;
@@ -123,9 +127,19 @@ export function WorldExperience() {
   const selectPlace = (place: AtlasPlace) => {
     setSelectedId(place.id);
     setRegion(place.region);
+    if (
+      place.placement === "reference" ||
+      atlasPlaceById(place.parent ?? "")?.placement === "reference"
+    )
+      setShowReference(true);
+    if (place.placement === "route") setShowRoutes(true);
+    if (place.focusBounds) {
+      camera.focusRect(place.focusBounds);
+      return;
+    }
     if (place.point) {
       const radius = place.parent
-        ? (atlasPlaceById(place.parent)?.radius ?? 55)
+        ? Math.max(28, atlasPlaceById(place.parent)?.radius ?? 55)
         : Math.max(28, place.radius ?? 50);
       camera.focusRect({
         x: place.point.x - radius * 3,
@@ -234,10 +248,9 @@ export function WorldExperience() {
     setStatus("Курс отменён. Корабль остался у причала.");
   };
   const displayed = visible.filter(
-    (p) =>
-      (!p.parent || level >= 2) &&
-      (camera.viewport.width >= 760 || region === "world" || p.region === region),
+    (p) => camera.viewport.width >= 760 || region === "world" || p.region === region,
   );
+  const expandedNames = expandedAtlasLabels(displayed, camera.scale, selectedId);
   return (
     <div
       className={`world-experience atlas-experience atlas-v2 ${immersive ? "atlas-immersive" : ""}`}
@@ -328,6 +341,7 @@ export function WorldExperience() {
               <h2>{selected.name}</h2>
               <span className="atlas-detail-english">{selected.english}</span>
               <p>{selected.description}</p>
+              {selected.note && <p className="atlas-place-note">{selected.note}</p>}
               {selected.parent && (
                 <button
                   className="atlas-parent"
@@ -349,7 +363,9 @@ export function WorldExperience() {
                         ? "Каноничный маршрут; расстояния и точка в мировой проекции условны."
                         : selected.placement === "local"
                           ? "Место относится к этому острову. Локальная точка привязана к нашей иллюстрации, а не к каноническим координатам."
-                          : "Место есть в каноне. Случайную метку на карте не ставим."}
+                          : selected.placement === "reference"
+                            ? "Положение перенесено из OP Maps в нашу проекцию. Это фанатская реконструкция; официальных координат она не подтверждает."
+                            : "Место есть в каноне. Случайную метку на карте не ставим."}
                   </span>
                 </div>
               </div>
@@ -389,18 +405,16 @@ export function WorldExperience() {
                   <ArrowRight size={13} />
                 </button>
               )}
-              {!!selected.radius && (
+              {relatedPlaces.length > 0 && (
                 <div className="atlas-related">
                   <span>МЕСТА В РЕГИОНЕ</span>
-                  {atlasPlaces
-                    .filter((p) => p.parent === selected.id)
-                    .map((p) => (
-                      <button key={p.id} onClick={() => selectPlace(p)}>
-                        <MapPin size={12} />
-                        {p.name}
-                        <ChevronArrow />
-                      </button>
-                    ))}
+                  {relatedPlaces.map((p) => (
+                    <button key={p.id} onClick={() => selectPlace(p)}>
+                      <MapPin size={12} />
+                      {p.name}
+                      <ChevronArrow />
+                    </button>
+                  ))}
                 </div>
               )}
             </div>
@@ -495,6 +509,14 @@ export function WorldExperience() {
                 <label>
                   <input
                     type="checkbox"
+                    checked={showReference}
+                    onChange={(e) => setShowReference(e.target.checked)}
+                  />
+                  Дополнения по OP Maps
+                </label>
+                <label>
+                  <input
+                    type="checkbox"
                     checked={showShips}
                     onChange={(e) => setShowShips(e.target.checked)}
                   />
@@ -535,6 +557,7 @@ export function WorldExperience() {
                   zoom={camera.camera.zoom}
                   showRoutes={showRoutes}
                   showShips={showShips}
+                  showReference={showReference}
                   sailing={!!journey}
                 />
                 {showNames &&
@@ -542,14 +565,15 @@ export function WorldExperience() {
                     <button
                       key={p.id}
                       data-map-control
-                      className={`atlas-place-label ${p.parent ? "subplace-label" : ""} ${p.placement === "route" ? "route-label" : ""} ${selectedId === p.id ? "is-selected" : ""} ${p.id === "baratie" ? "ship-label" : ""}`}
+                      className={`atlas-place-label ${p.parent ? "subplace-label" : ""} ${p.placement === "route" ? "route-label" : ""} ${p.placement === "reference" ? "reference-label" : ""} ${!expandedNames.has(p.id) ? "compact-map-label" : ""} ${selectedId === p.id ? "is-selected" : ""} ${p.id === "baratie" ? "ship-label" : ""}`}
                       style={
                         {
                           left: p.point!.x,
-                          top: p.parent ? p.point!.y - 8 : p.point!.y + (p.radius ?? 12) + 13,
+                          top: expandedNames.has(p.id) ? atlasLabelTop(p) : p.point!.y,
                         } as CSSProperties
                       }
                       aria-label={`Найти на карте: ${p.name}`}
+                      title={p.name}
                       aria-pressed={p.id === selectedId}
                       onClick={() => selectPlace(p)}
                     >
@@ -558,6 +582,12 @@ export function WorldExperience() {
                       {level >= 1 && !p.parent && <small>{p.name}</small>}
                       {p.placement === "route" && (
                         <span className="route-position-dot" title="Схематическое положение" />
+                      )}
+                      {p.placement === "reference" && (
+                        <span
+                          className="reference-position-dot"
+                          title="Привязка к фанатскому атласу"
+                        />
                       )}
                     </button>
                   ))}
@@ -610,6 +640,12 @@ export function WorldExperience() {
                 <i className="legend-route" />
                 Схема маршрута
               </span>
+              {showReference && (
+                <span>
+                  <i className="legend-reference" />
+                  OP Maps
+                </span>
+              )}
             </div>
             <div className="map-zoom-controls" data-map-control>
               <button
@@ -694,6 +730,13 @@ export function WorldExperience() {
               У мира One Piece нет опубликованного набора точных координат всех островов. Этот атлас
               сохраняет подтверждённые регионы, связи и взаимное положение там, где они показаны.
               Контуры, рельеф и масштаб — наша иллюстрация.
+            </p>
+            <p>
+              Каталог расширен по OP Maps: сравнили 84 островных маркера и 23 места интереса.
+              Дополнительные позиции помечены отдельно и отключаются слоем «Дополнения по OP Maps».
+              Имена из манги и фанатские мировые точки — разные сведения. Молочный остров объединён
+              с Сырным, а Winter Island — с Winner Island; движущиеся Зоу и Джерма остаются без
+              фиксированных координат.
             </p>
             <div className="atlas-accuracy-key">
               <div>

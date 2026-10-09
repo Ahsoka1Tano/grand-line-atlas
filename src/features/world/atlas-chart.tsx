@@ -195,9 +195,11 @@ function Island({ place, level }: { place: AtlasPlace; level: number }) {
       "alabasta",
       "wano",
       "water-seven",
+      "whole-cake",
+      "egghead",
     ].includes(place.id)
   ) {
-    const span = place.radius * 3.2;
+    const span = place.radius * (["wano", "egghead", "whole-cake"].includes(place.id) ? 2.05 : 3.2);
     return (
       <g
         transform={`translate(${place.point.x} ${place.point.y})`}
@@ -217,7 +219,8 @@ function Island({ place, level }: { place: AtlasPlace; level: number }) {
   }
   const [green, sand] = palette[place.terrain ?? "forest"];
   const outline = outlines[place.id] ?? defaultOutline;
-  const ratio = place.radius / (outlines[place.id] ? 62 : 38);
+  const symbolScale = place.placement === "reference" ? 0.6 : 1;
+  const ratio = (place.radius / (outlines[place.id] ? 62 : 38)) * symbolScale;
   const icon =
     place.id === "dawn"
       ? "windmill"
@@ -266,7 +269,7 @@ function Island({ place, level }: { place: AtlasPlace; level: number }) {
         )}
       </g>
       <g transform={`translate(3 ${place.id === "dawn" ? 5 : 0})`}>
-        <AtlasEmblem type={icon} size={Math.min(0.83, place.radius / 68)} />
+        <AtlasEmblem type={icon} size={Math.min(0.83, place.radius / 68) * symbolScale} />
       </g>
     </g>
   );
@@ -303,26 +306,20 @@ const archipelagoIslets: Record<string, [number, number, number][]> = {
     [-27, 23, 7],
     [-39, 13, 6],
   ],
-  "whole-cake": [
-    [-83, 15, 12],
-    [-60, 55, 10],
-    [-2, 71, 13],
-    [42, 62, 11],
-    [92, -12, 10],
-    [-33, -71, 11],
-  ],
 };
 export const AtlasChart = memo(function AtlasChart({
   motion,
   zoom,
   showRoutes = true,
   showShips = true,
+  showReference = true,
   sailing = false,
 }: {
   motion: boolean;
   zoom: number;
   showRoutes?: boolean;
   showShips?: boolean;
+  showReference?: boolean;
   sailing?: boolean;
 }) {
   const level = atlasDetailLevel(zoom);
@@ -331,7 +328,8 @@ export const AtlasChart = memo(function AtlasChart({
       p.point &&
       p.radius &&
       (p.detail <= level || p.detail < 2) &&
-      (showRoutes || p.placement !== "route"),
+      (showRoutes || p.placement !== "route") &&
+      (showReference || p.placement !== "reference"),
   );
   return (
     <svg

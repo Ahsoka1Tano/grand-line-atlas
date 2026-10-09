@@ -1,0 +1,18 @@
+{
+  "createdAt": "2026-10-09",
+  "mode": "built-in imagegen; new generation; transparent_background=true",
+  "assets": [
+    {
+      "id": "whole-cake-vignette",
+      "source": "assets/source-world/atlas/whole-cake-vignette.png",
+      "image": "/world/atlas/whole-cake-vignette.webp",
+      "prompt": "Use case: stylized-concept. Asset type: transparent illustrated island vignette for a premium One Piece nautical atlas. Exquisite hand-painted gouache and fine engraved brown ink, almost overhead bird's-eye view with slight relief, complete coastline visible. Isolated centered square canvas with ten percent transparent padding. Subject: WHOLE CAKE ISLAND from One Piece before the destruction of Whole Cake Chateau. A recognizable whimsical enormous tiered white and pink wedding-cake castle at the center, the colorful Sweet City around its base, a lush magical candy-colored forest on one side, small harbors, rolling tropical green hills and whimsical confectionery buildings. ONE main island only, NO surrounding Totto Land islands (they are drawn separately in the app). Sophisticated cartographic craft, tiny architecture, refined muted jewel colors, pink cream ochre turquoise and green, realistic ink detail blended with anime landmark design. A genuinely transparent background, narrow turquoise coastal wash only, no blue ocean rectangle, no text or labels or watermark. Artistic interpretation of landmarks, not an assertion of exact canonical coastline."
+    },
+    {
+      "id": "egghead-vignette",
+      "source": "assets/source-world/atlas/egghead-vignette.png",
+      "image": "/world/atlas/egghead-vignette.webp",
+      "prompt": "Use case: stylized-concept. Asset type: transparent illustrated island vignette for a premium One Piece nautical atlas. Exquisite hand-painted gouache and fine engraved brown ink, almost overhead bird's-eye view with slight relief, complete coastline visible. Isolated centered square canvas with ten percent transparent padding. Subject: EGGHEAD ISLAND from One Piece before the attack, the recognizable futuristic island of Dr. Vegapunk. Tropical green island, white and pale-pink rounded retro-futuristic domes and giant laboratory buildings, the immense floating spherical Punk Records laboratory above a circular cloud-like platform, science-fantasy towers and ring structures, neat tiny industrial corridors, a small sea harbor and metallic curved bridges. The huge spherical laboratory must be unmistakable and dominate the upper island relief; lush island and smaller Egghead factory city below it. One Piece anime science-fantasy design rather than generic cyberpunk skyscrapers. Sophisticated cartographic craft, tiny architecture, refined pale silver cream muted pink turquoise and green. A genuinely transparent background, narrow turquoise coastal wash only, no ocean rectangle, no text or labels or watermark. Artistic interpretation of landmarks, not an assertion of exact canonical coastline."
+    }
+  ]
+}

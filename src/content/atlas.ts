@@ -1,3 +1,5 @@
+import { expandAtlas } from "./atlas-expansion";
+
 export type AtlasRegion =
   "world" | "east-blue" | "north-blue" | "west-blue" | "south-blue" | "paradise" | "new-world";
 export type AtlasPoint = { x: number; y: number };
@@ -9,13 +11,17 @@ export type AtlasPlace = {
   kind: "island" | "archipelago" | "city" | "ship" | "sky" | "underwater" | "continent";
   description: string;
   source: string;
-  placement: "chart" | "route" | "local" | "unknown" | "moving";
+  placement: "chart" | "route" | "local" | "reference" | "unknown" | "moving";
   point?: AtlasPoint;
   radius?: number;
   terrain?: "forest" | "desert" | "snow" | "city" | "volcano" | "cake" | "grove";
   detail: 0 | 1 | 2;
   parent?: string;
   scene?: string;
+  reference?: string;
+  aliases?: string[];
+  note?: string;
+  focusBounds?: { x: number; y: number; width: number; height: number };
 };
 export const atlasRegions: {
   id: AtlasRegion;
@@ -67,6 +73,14 @@ export const atlasRegions: {
   },
 ];
 export const atlasSources = [
+  {
+    id: "opmaps",
+    title: "OP Maps · фанатский атлас",
+    publication: "op-maps.com · версия 0.70.1, сверка 8 октября 2026",
+    url: "https://www.op-maps.com/en",
+    reference: "https://www.op-maps.com/en",
+    note: "Положения дополнительных островов перенесены из видимых маркеров референса и зарегистрированы в нашей проекции. Это фанатская реконструкция, не официальные координаты Оды. Движущиеся места не закреплены на карте.",
+  },
   {
     id: "cw1",
     title: "Color Walk 1 · East Blue",
@@ -186,7 +200,7 @@ const unplaced = (
 });
 // Projection units, not geographic coordinates. East Blue anchors are manually
 // registered to the published chart; none are randomly scattered on render.
-export const atlasPlaces: AtlasPlace[] = [
+export const atlasPlaces: AtlasPlace[] = expandAtlas([
   chart(
     "dawn",
     "Остров Рассвета",
@@ -890,15 +904,24 @@ export const atlasPlaces: AtlasPlace[] = [
     "new-world",
     "Для определения положения нужны четыре Road Poneglyph. Подтверждённой точки для этого атласа нет.",
   ),
-];
+]);
 export const atlasPlaceById = (id: string) => atlasPlaces.find((p) => p.id === id);
 export function atlasDetailLevel(zoom: number): 0 | 1 | 2 {
   return zoom < 1.8 ? 0 : zoom < 3.8 ? 1 : 2;
 }
-export function visibleAtlasPlaces(zoom: number, showRoutes = true) {
+export function visibleAtlasPlaces(zoom: number, showRoutes = true, showReference = true) {
   const detail = atlasDetailLevel(zoom);
+  const dependsOnReference = (place: AtlasPlace): boolean => {
+    if (place.placement === "reference") return true;
+    const parent = place.parent ? atlasPlaceById(place.parent) : undefined;
+    return !!parent && dependsOnReference(parent);
+  };
   return atlasPlaces.filter(
-    (p) => p.point && p.detail <= detail && (showRoutes || p.placement !== "route"),
+    (p) =>
+      p.point &&
+      p.detail <= detail &&
+      (showRoutes || p.placement !== "route") &&
+      (showReference || !dependsOnReference(p)),
   );
 }
 export function searchAtlas(query: string, region: AtlasRegion = "world") {
@@ -906,6 +929,9 @@ export function searchAtlas(query: string, region: AtlasRegion = "world") {
   return atlasPlaces.filter(
     (p) =>
       (region === "world" || p.region === region) &&
-      (!q || `${p.name} ${p.english}`.toLocaleLowerCase().includes(q)),
+      (!q ||
+        `${p.name} ${p.english} ${p.reference ?? ""} ${p.aliases?.join(" ") ?? ""}`
+          .toLocaleLowerCase()
+          .includes(q)),
   );
 }

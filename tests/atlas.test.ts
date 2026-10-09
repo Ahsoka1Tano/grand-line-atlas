@@ -8,6 +8,8 @@ import {
   searchAtlas,
 } from "../src/content/atlas";
 import { worldLocations } from "../src/content/world";
+import reference from "../src/content/atlas-reference.json";
+import { expandedAtlasLabels } from "../src/features/world/atlas-labels";
 import {
   getRoute,
   routePath,
@@ -88,4 +90,55 @@ test("desktop to phone resize keeps the same world center instead of sliding to 
   assert.equal(resized.zoom, camera.zoom);
   assert.ok(Math.abs(resized.x / fitScale(phone) - camera.x / fitScale(desktop)) < 0.001);
   assert.ok(Math.abs(resized.y / fitScale(phone) - camera.y / fitScale(desktop)) < 0.001);
+});
+
+test("every observed OP Maps island and point is covered, including aliases and moving places", () => {
+  const normalized = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+  for (const row of reference.rows) {
+    assert.ok(
+      atlasPlaces.some((p) =>
+        [p.english, p.reference, ...(p.aliases ?? [])]
+          .filter(Boolean)
+          .some((name) => normalized(name!) === normalized(row.name)),
+      ),
+      row.name,
+    );
+  }
+  assert.equal(reference.rows.length, 107);
+});
+
+test("Totto Land has 35 distinct islands and corrected labels do not invent duplicate land", () => {
+  const islands = atlasPlaces.filter((p) => p.parent === "totto-land");
+  assert.equal(islands.length, 35);
+  assert.ok(islands.some((p) => p.id === "whole-cake"));
+  assert.equal(searchAtlas("Milk Island")[0]?.id, "cheese");
+  assert.equal(searchAtlas("Winter Island")[0]?.id, "winner");
+  assert.ok(!atlasPlaceById("milk") && !atlasPlaceById("winter"));
+  assert.equal(atlasPlaceById("whisky-peak")?.parent, "cactus");
+});
+
+test("reference layer is explicit and hiding it also hides dependent settlement points", () => {
+  const visible = visibleAtlasPlaces(14, false, false);
+  assert.ok(!visible.some((p) => p.placement === "reference"));
+  assert.ok(!visible.some((p) => p.id === "harahettania"));
+  assert.ok(visible.some((p) => p.id === "foosha"));
+  for (const p of atlasPlaces.filter((p) => p.placement === "reference")) {
+    assert.equal(p.source, "opmaps");
+    assert.ok(
+      reference.rows.some((row) => row.name === p.reference),
+      p.id,
+    );
+  }
+});
+
+test("crowded names collapse while the selected location always gets its full label", () => {
+  const first = atlasPlaceById("candy")!;
+  const second = { ...atlasPlaceById("cheese")!, point: first.point };
+  const names = expandedAtlasLabels([first, second], 1, second.id);
+  assert.ok(names.has(second.id));
+  assert.ok(!names.has(first.id));
+  assert.equal(
+    expandedAtlasLabels([first, { ...second, point: { x: 2000, y: 1200 } }], 1, null).size,
+    2,
+  );
 });

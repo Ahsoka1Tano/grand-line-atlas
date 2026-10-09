@@ -804,6 +804,83 @@
   width: 9px;
   opacity: 0.5;
 }
+.mark-reference {
+  color: #baa9d1;
+}
+.legend-reference {
+  width: 7px;
+  height: 7px;
+  border: 1px dashed #765b81;
+  border-radius: 50%;
+}
+.reference-position-dot {
+  position: absolute;
+  top: -4px;
+  left: calc(50% - 3px);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  border: 1px dashed #765b81;
+  background: #ebdded;
+}
+.atlas-place-note {
+  border-left: 1px solid #a38cb4;
+  padding-left: 10px;
+  color: #a9bdb5;
+  font-size: 10px;
+}
+.compact-map-label {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 0;
+  width: 18px;
+  height: 18px;
+  min-height: 18px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%) scale(var(--label-scale, 1));
+}
+.compact-map-label::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 5px;
+  height: 5px;
+  border: 1px solid #617759;
+  border-radius: 50%;
+  background: #eadfc7;
+  box-shadow: 0 1px 3px #24412e70;
+}
+.compact-map-label.reference-label::after {
+  border-style: dashed;
+  border-color: #765b81;
+  background: #ebdded;
+}
+.compact-map-label strong,
+.compact-map-label small,
+.compact-map-label .atlas-label-rule,
+.compact-map-label .reference-position-dot,
+.compact-map-label .route-position-dot {
+  display: none;
+}
+.compact-map-label:hover,
+.compact-map-label:focus-visible {
+  z-index: 10;
+}
+.compact-map-label:hover strong,
+.compact-map-label:focus-visible strong {
+  display: block;
+  position: absolute;
+  left: 50%;
+  bottom: 19px;
+  transform: translateX(-50%);
+  padding: 8px 10px;
+  background: #f4e6cdeb;
+  border: 1px solid #8c9a7959;
+  box-shadow: 0 3px 8px #20362944;
+  border-radius: 3px;
+}
 .atlas-region-portal {
   position: absolute;
   transform: translate(-50%, 0) scale(var(--label-scale, 1));

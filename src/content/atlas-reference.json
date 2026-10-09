@@ -1,0 +1,650 @@
+{
+  "url": "https://www.op-maps.com/en",
+  "version": "0.70.1",
+  "observedAt": "2026-10-08",
+  "coordinateSystem": "DOM marker translations from a single unchanged OP Maps viewport. Fan chart coordinates; not official world coordinates.",
+  "rows": [
+    {
+      "name": "Upper Yard",
+      "category": "islands",
+      "x": 1420,
+      "y": 363
+    },
+    {
+      "name": "Flavor",
+      "category": "islands",
+      "x": -597,
+      "y": 398
+    },
+    {
+      "name": "Wano Country",
+      "category": "islands",
+      "x": -52,
+      "y": 361
+    },
+    {
+      "name": "Weatheria",
+      "category": "islands",
+      "x": 1645,
+      "y": 275
+    },
+    {
+      "name": "100% Island",
+      "category": "islands",
+      "x": -515,
+      "y": 269
+    },
+    {
+      "name": "Kingdom of Alabasta",
+      "category": "islands",
+      "x": 1172,
+      "y": 313
+    },
+    {
+      "name": "Angel Island",
+      "category": "islands",
+      "x": 1442,
+      "y": 385
+    },
+    {
+      "name": "Ballon Terminal",
+      "category": "islands",
+      "x": -232,
+      "y": 331
+    },
+    {
+      "name": "Ballywood Kingdom",
+      "category": "islands",
+      "x": 128,
+      "y": 882
+    },
+    {
+      "name": "Baltigo",
+      "category": "islands",
+      "x": -174,
+      "y": 502
+    },
+    {
+      "name": "Banaro Island",
+      "category": "islands",
+      "x": 1823,
+      "y": 285
+    },
+    {
+      "name": "Baratie",
+      "category": "islands",
+      "x": 1682,
+      "y": 65
+    },
+    {
+      "name": "Biscuits",
+      "category": "islands",
+      "x": -613,
+      "y": 350
+    },
+    {
+      "name": "Boin Archipelago",
+      "category": "islands",
+      "x": 917,
+      "y": 474
+    },
+    {
+      "name": "G-14",
+      "category": "islands",
+      "x": 104,
+      "y": 482
+    },
+    {
+      "name": "Kingdom of Briss",
+      "category": "islands",
+      "x": 1027,
+      "y": 927
+    },
+    {
+      "name": "Cacao",
+      "category": "islands",
+      "x": -532,
+      "y": 353
+    },
+    {
+      "name": "Cactus Island",
+      "category": "islands",
+      "x": 874,
+      "y": 355
+    },
+    {
+      "name": "Candy",
+      "category": "islands",
+      "x": -563,
+      "y": 325
+    },
+    {
+      "name": "Cheese",
+      "category": "islands",
+      "x": -598,
+      "y": 376
+    },
+    {
+      "name": "Conomi Islands",
+      "category": "islands",
+      "x": 1192,
+      "y": -268
+    },
+    {
+      "name": "Deul Kingdom",
+      "category": "islands",
+      "x": 82,
+      "y": -138
+    },
+    {
+      "name": "Drum Island",
+      "category": "islands",
+      "x": 1041,
+      "y": 290
+    },
+    {
+      "name": "Egghead",
+      "category": "islands",
+      "x": 33,
+      "y": 448
+    },
+    {
+      "name": "Whole Cake Island",
+      "category": "islands",
+      "x": -594,
+      "y": 308
+    },
+    {
+      "name": "Elbaf",
+      "category": "islands",
+      "x": 140,
+      "y": 384
+    },
+    {
+      "name": "Foodvalten Island",
+      "category": "islands",
+      "x": -174,
+      "y": 446
+    },
+    {
+      "name": "Foolshout Island",
+      "category": "islands",
+      "x": 1306,
+      "y": 455
+    },
+    {
+      "name": "Winner Island",
+      "category": "islands",
+      "x": 98,
+      "y": 311
+    },
+    {
+      "name": "Funwari",
+      "category": "islands",
+      "x": -551,
+      "y": 397
+    },
+    {
+      "name": "Gecko Islands",
+      "category": "islands",
+      "x": 1525,
+      "y": -210
+    },
+    {
+      "name": "Kingdom of Germa",
+      "category": "islands",
+      "x": -215,
+      "y": 285
+    },
+    {
+      "name": "God Valley",
+      "category": "islands",
+      "x": 2,
+      "y": 714
+    },
+    {
+      "name": "Hachinosu",
+      "category": "islands",
+      "x": 224,
+      "y": 446
+    },
+    {
+      "name": "Hidden Cloud Village",
+      "category": "islands",
+      "x": 1395,
+      "y": 353
+    },
+    {
+      "name": "Ice",
+      "category": "islands",
+      "x": -549,
+      "y": 273
+    },
+    {
+      "name": "Rare Animal Island",
+      "category": "islands",
+      "x": 1727,
+      "y": -205
+    },
+    {
+      "name": "Jam",
+      "category": "islands",
+      "x": -553,
+      "y": 371
+    },
+    {
+      "name": "Jaya",
+      "category": "islands",
+      "x": 1329,
+      "y": 389
+    },
+    {
+      "name": "Jelly",
+      "category": "islands",
+      "x": -509,
+      "y": 327
+    },
+    {
+      "name": "Karai Bari Island",
+      "category": "islands",
+      "x": -341,
+      "y": 393
+    },
+    {
+      "name": "Kenzan Island",
+      "category": "islands",
+      "x": 1540,
+      "y": 469
+    },
+    {
+      "name": "Kibo",
+      "category": "islands",
+      "x": -514,
+      "y": 385
+    },
+    {
+      "name": "Kimi",
+      "category": "islands",
+      "x": -636,
+      "y": 368
+    },
+    {
+      "name": "Kinko",
+      "category": "islands",
+      "x": -580,
+      "y": 419
+    },
+    {
+      "name": "Nuts",
+      "category": "islands",
+      "x": -577,
+      "y": 349
+    },
+    {
+      "name": "Kyuka Island",
+      "category": "islands",
+      "x": 962,
+      "y": 340
+    },
+    {
+      "name": "Liqueur",
+      "category": "islands",
+      "x": -475,
+      "y": 317
+    },
+    {
+      "name": "Little Garden",
+      "category": "islands",
+      "x": 903,
+      "y": 292
+    },
+    {
+      "name": "Lodestar Island",
+      "category": "islands",
+      "x": 390,
+      "y": 391
+    },
+    {
+      "name": "Long Ring Long Land",
+      "category": "islands",
+      "x": 1562,
+      "y": 334
+    },
+    {
+      "name": "Kingdom of Lvneel",
+      "category": "islands",
+      "x": -91,
+      "y": -209
+    },
+    {
+      "name": "Margarine",
+      "category": "islands",
+      "x": -499,
+      "y": 280
+    },
+    {
+      "name": "Milenge",
+      "category": "islands",
+      "x": -541,
+      "y": 418
+    },
+    {
+      "name": "Milk",
+      "category": "islands",
+      "x": -486,
+      "y": 378
+    },
+    {
+      "name": "Ohara",
+      "category": "islands",
+      "x": -232,
+      "y": 967
+    },
+    {
+      "name": "Minion Island",
+      "category": "islands",
+      "x": -550,
+      "y": -320
+    },
+    {
+      "name": "Mirror Ball Island",
+      "category": "islands",
+      "x": 1502,
+      "y": -352
+    },
+    {
+      "name": "Namakura Island",
+      "category": "islands",
+      "x": 1612,
+      "y": 443
+    },
+    {
+      "name": "Nanimonai Island",
+      "category": "islands",
+      "x": 1090,
+      "y": 355
+    },
+    {
+      "name": "Noko",
+      "category": "islands",
+      "x": -494,
+      "y": 351
+    },
+    {
+      "name": "Onigashima",
+      "category": "islands",
+      "x": -69,
+      "y": 396
+    },
+    {
+      "name": "Organ Island",
+      "category": "islands",
+      "x": 1783,
+      "y": -264
+    },
+    {
+      "name": "Kingdom of Oykot",
+      "category": "islands",
+      "x": 1343,
+      "y": 72
+    },
+    {
+      "name": "Package",
+      "category": "islands",
+      "x": -632,
+      "y": 408
+    },
+    {
+      "name": "Polestar Islands",
+      "category": "islands",
+      "x": 870,
+      "y": 122
+    },
+    {
+      "name": "Poripori",
+      "category": "islands",
+      "x": -627,
+      "y": 324
+    },
+    {
+      "name": "Potato",
+      "category": "islands",
+      "x": -503,
+      "y": 407
+    },
+    {
+      "name": "Pucci Island",
+      "category": "islands",
+      "x": 1833,
+      "y": 335
+    },
+    {
+      "name": "Renaisse",
+      "category": "islands",
+      "x": 1006,
+      "y": 385
+    },
+    {
+      "name": "Reverse Mountain",
+      "category": "islands",
+      "x": 578,
+      "y": 391
+    },
+    {
+      "name": "Rokumitsu",
+      "category": "islands",
+      "x": -591,
+      "y": 272
+    },
+    {
+      "name": "Winter Island",
+      "category": "islands",
+      "x": 98,
+      "y": 311
+    },
+    {
+      "name": "Yakigashi",
+      "category": "islands",
+      "x": -469,
+      "y": 259
+    },
+    {
+      "name": "San Faldo",
+      "category": "islands",
+      "x": 1795,
+      "y": 429
+    },
+    {
+      "name": "Shift Station",
+      "category": "islands",
+      "x": 1861,
+      "y": 371
+    },
+    {
+      "name": "Skypiea",
+      "category": "islands",
+      "x": 1417,
+      "y": 370
+    },
+    {
+      "name": "Sphinx Island",
+      "category": "islands",
+      "x": 101,
+      "y": 424
+    },
+    {
+      "name": "St Poplar",
+      "category": "islands",
+      "x": 1908,
+      "y": 439
+    },
+    {
+      "name": "Kingdom of Turin",
+      "category": "islands",
+      "x": 1828,
+      "y": 686
+    },
+    {
+      "name": "Toroa Island",
+      "category": "islands",
+      "x": -569,
+      "y": 938
+    },
+    {
+      "name": "Ukkari Island",
+      "category": "islands",
+      "x": 1375,
+      "y": 315
+    },
+    {
+      "name": "Yukiryu Island",
+      "category": "islands",
+      "x": -350,
+      "y": 280
+    },
+    {
+      "name": "Zou",
+      "category": "islands",
+      "x": -350,
+      "y": 483
+    },
+    {
+      "name": "Udon",
+      "category": "pointsOfInterest",
+      "x": -67,
+      "y": 374
+    },
+    {
+      "name": "Alubarna",
+      "category": "pointsOfInterest",
+      "x": 1185,
+      "y": 306
+    },
+    {
+      "name": "Arlong Park",
+      "category": "pointsOfInterest",
+      "x": 1133,
+      "y": -260
+    },
+    {
+      "name": "Villa Cocoyasi",
+      "category": "pointsOfInterest",
+      "x": 1150,
+      "y": -231
+    },
+    {
+      "name": "Elumalu",
+      "category": "pointsOfInterest",
+      "x": 1165,
+      "y": 329
+    },
+    {
+      "name": "Villa Gosa",
+      "category": "pointsOfInterest",
+      "x": 1192,
+      "y": -252
+    },
+    {
+      "name": "Hakumai",
+      "category": "pointsOfInterest",
+      "x": -43,
+      "y": 381
+    },
+    {
+      "name": "Harahettania",
+      "category": "pointsOfInterest",
+      "x": 1617,
+      "y": 443
+    },
+    {
+      "name": "Kibi",
+      "category": "pointsOfInterest",
+      "x": -58,
+      "y": 346
+    },
+    {
+      "name": "Kuri",
+      "category": "pointsOfInterest",
+      "x": -78,
+      "y": 345
+    },
+    {
+      "name": "Loguetown",
+      "category": "pointsOfInterest",
+      "x": 871,
+      "y": 111
+    },
+    {
+      "name": "Mock Town",
+      "category": "pointsOfInterest",
+      "x": 1317,
+      "y": 389
+    },
+    {
+      "name": "Nanohana",
+      "category": "pointsOfInterest",
+      "x": 1184,
+      "y": 330
+    },
+    {
+      "name": "Notice Town",
+      "category": "pointsOfInterest",
+      "x": -496,
+      "y": -97
+    },
+    {
+      "name": "Orange Town",
+      "category": "pointsOfInterest",
+      "x": 1809,
+      "y": -257
+    },
+    {
+      "name": "Rainbase",
+      "category": "pointsOfInterest",
+      "x": 1160,
+      "y": 303
+    },
+    {
+      "name": "Rakesh",
+      "category": "pointsOfInterest",
+      "x": -493,
+      "y": -228
+    },
+    {
+      "name": "Ringo",
+      "category": "pointsOfInterest",
+      "x": -39,
+      "y": 362
+    },
+    {
+      "name": "Alluring Forest",
+      "category": "pointsOfInterest",
+      "x": -585,
+      "y": 311
+    },
+    {
+      "name": "Sweet City",
+      "category": "pointsOfInterest",
+      "x": -593,
+      "y": 305
+    },
+    {
+      "name": "Villa Syrup",
+      "category": "pointsOfInterest",
+      "x": 1512,
+      "y": -210
+    },
+    {
+      "name": "Tamarisk",
+      "category": "pointsOfInterest",
+      "x": 1204,
+      "y": 314
+    },
+    {
+      "name": "Twin Cape",
+      "category": "pointsOfInterest",
+      "x": 808,
+      "y": 406
+    }
+  ]
+}
